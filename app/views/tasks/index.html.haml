@@ -1,0 +1,25 @@
+%h1 Listing tasks
+
+%table
+  %tr
+    %th Task
+    %th Name
+    %th Sod
+    %th Weight
+    %th
+    %th
+    %th
+
+  - @tasks.each do |task|
+    %tr
+      %td= task.task_id
+      %td= task.name
+      %td= task.sod
+      %td= task.weight
+      %td= link_to 'Show', task
+      %td= link_to 'Edit', edit_task_path(task)
+      %td= link_to 'Destroy', task, :confirm => 'Are you sure?', :method => :delete
+
+%br
+
+= link_to 'New Task', new_task_path

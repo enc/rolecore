@@ -1,0 +1,19 @@
+%h1 Listing relation_properties
+
+%table
+  %tr
+    %th Relation
+    %th
+    %th
+    %th
+
+  - @relation_properties.each do |relation_property|
+    %tr
+      %td= relation_property.relation_id
+      %td= link_to 'Show', relation_property
+      %td= link_to 'Edit', edit_relation_property_path(relation_property)
+      %td= link_to 'Destroy', relation_property, :confirm => 'Are you sure?', :method => :delete
+
+%br
+
+= link_to 'New Relation property', new_relation_property_path

@@ -1,0 +1,18 @@
+%p#notice= notice
+
+%p
+  %b Task:
+  = @task.task_id
+%p
+  %b Name:
+  = @task.name
+%p
+  %b Sod:
+  = @task.sod
+%p
+  %b Weight:
+  = @task.weight
+
+= link_to 'Edit', edit_task_path(@task)
+\|
+= link_to 'Back', tasks_path

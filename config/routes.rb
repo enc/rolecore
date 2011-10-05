@@ -1,4 +1,12 @@
 Rolecore::Application.routes.draw do
+  get "master/root"
+
+  resources :relation_properties
+
+  resources :relations
+
+  resources :tasks
+
   resources :roles
 
   # The priority is based upon order of creation:
@@ -50,7 +58,7 @@ Rolecore::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+  root :to => 'master#root'
 
   # See how all your routes lay out with "rake routes"
 

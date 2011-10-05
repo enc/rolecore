@@ -1,0 +1,9 @@
+%p#notice= notice
+
+%p
+  %b Relation:
+  = @relation_property.relation_id
+
+= link_to 'Edit', edit_relation_property_path(@relation_property)
+\|
+= link_to 'Back', relation_properties_path
