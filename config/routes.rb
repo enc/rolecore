@@ -1,9 +1,9 @@
 Rolecore::Application.routes.draw do
+  resources :relations
+
   get "master/root"
 
   resources :relation_properties
-
-  resources :relations
 
   resources :tasks
 

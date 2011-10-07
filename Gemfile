@@ -17,7 +17,10 @@ group :assets do
   gem 'uglifier'
 end
 
-gem 'rails3-generators', :group => :development
+group :develoment do
+  gem 'pry'
+  gem 'rails3-generators'
+end
 
 gem 'jquery-rails'
 
