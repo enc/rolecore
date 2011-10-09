@@ -22,5 +22,18 @@ describe Role do
     role.add_subrole subrole
     subrole.add_task Factory(:task)
     role.all_tasks.count.should eq(1)
+    role.add_task Factory(:task)
+    role.all_tasks.count.should eq(2)
+  end
+
+  it "returns all children, no matter how deep nested" do
+    subrole = Factory(:role)
+    role.add_subrole subrole
+    subrole.add_subrole Factory(:role)
+    role.relations.count.should eq(1)
+    role.all_childs.count.should eq(2)
+    role.add_subrole Factory(:role)
+    role.relations.count.should eq(2)
+    role.all_childs.count.should eq(3)
   end
 end

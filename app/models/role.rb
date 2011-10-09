@@ -21,4 +21,8 @@ class Role < ActiveRecord::Base
   def all_tasks
     tasks + childs.collect { |i| i.all_tasks } .flatten
   end
+
+  def all_childs
+    (childs + childs.collect { |i| i.all_childs } ).flatten
+  end
 end
