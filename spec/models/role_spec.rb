@@ -27,13 +27,25 @@ describe Role do
   end
 
   it "returns all children, no matter how deep nested" do
-    subrole = Factory(:role)
-    role.add_subrole subrole
-    subrole.add_subrole Factory(:role)
+    subrole = Factory.create(:role)
+    subrole.name.should eq("Rolle7")
+    role.add_subrole subrole  # 1 Kind
+
+    srole2 = Factory(:role)  # 1 Kindeskind, 2. Kind
+    srole2.name.should eq("Rolle9")
+    role.childs.first.add_subrole srole2
+
     role.relations.count.should eq(1)
     role.all_childs.count.should eq(2)
-    role.add_subrole Factory(:role)
+
+    srole3 = Factory(:role) # 2. Kind, 3 Kinder gesammt
+    srole3.name.should eq("Rolle10")
+    role.add_subrole srole3
     role.relations.count.should eq(2)
-    role.all_childs.count.should eq(3)
+    role.childs.count.should eq(2)
+    role.childs.first.childs.count.should eq(1)
+
+    role.all_childs[0].name.should eq("Rolle7")
+    role.all_childs.size.should eq(3)
   end
 end

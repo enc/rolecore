@@ -23,6 +23,6 @@ class Role < ActiveRecord::Base
   end
 
   def all_childs
-    (childs + childs.collect { |i| i.all_childs } ).flatten
+    (childs.all + childs.all.collect { |i| i.all_childs } ).flatten
   end
 end
