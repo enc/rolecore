@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111004104646) do
+ActiveRecord::Schema.define(:version => 20111007091020) do
 
   create_table "relation_properties", :force => true do |t|
     t.integer  "relation_id"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(:version => 20111004104646) do
 
   create_table "relations", :force => true do |t|
     t.integer  "parent_id"
-    t.integer  "child_id"
-    t.string   "child_type"
+    t.integer  "child_role_id"
+    t.integer  "child_task_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
