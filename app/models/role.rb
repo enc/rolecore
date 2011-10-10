@@ -19,7 +19,7 @@ class Role < ActiveRecord::Base
   end
 
   def all_tasks
-    tasks + childs.collect { |i| i.all_tasks } .flatten
+    tasks + childs.all.collect { |i| i.all_tasks } .flatten
   end
 
   def all_childs
