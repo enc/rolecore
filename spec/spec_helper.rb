@@ -35,6 +35,7 @@ Spork.prefork do
     config.use_transactional_fixtures = true
     config.include Factory::Syntax::Methods
   end
+  Capybara.javascript_driver = :webkit
 end
 
 Spork.each_run do

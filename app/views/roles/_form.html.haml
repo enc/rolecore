@@ -1,16 +1,12 @@
-= form_for @role do |f|
+= semantic_form_for @role, :remote => true do |f|
   -if @role.errors.any?
     #error_explanation
       %h2= "#{pluralize(@role.errors.count, "error")} prohibited this role from being saved:"
       %ul
         - @role.errors.full_messages.each do |msg|
           %li= msg
-
-  .field
-    = f.label :name
-    = f.text_field :name
-  .field
-    = f.label :weight
-    = f.number_field :weight
-  .actions
-    = f.submit 'Save'
+  = f.inputs do
+    = f.input :name
+    = f.input :weight, :hint => "Increse weight for importent roles."
+  = f.buttons do
+    = f.commit_button "Create"

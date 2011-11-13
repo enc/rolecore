@@ -9,24 +9,35 @@ class Rolemodel
     @signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
 
 
-  draw: (xOffset, yOffset) ->
+  draw: (xOffset, yOffset, scale) ->
+
     c = @paper.path(@baseFrame)
     c.translate xOffset, yOffset
     c.attr
       fill: "rgb(232, 224, 156)"
       opacity: 0.5
+    c.scale scale, scale, 0, 0
+
     d = @paper.path @signalEdge
     d.translate xOffset, yOffset
     d.attr
       fill: "rgb(255, 47, 0)"
+    d.scale scale, scale, 0, 0
 
-class Testor
-  constructor: (@msg) ->
+    label = @paper.text xOffset+(-90*scale), yOffset+(-55*scale), "Role" + xOffset
+    label.attr
+      'font-size': 18*scale
+    # label.translate xOffset, yOffset
 
-  hail: ->
-    alert @msg + ":says the King."
+drawroles = (roles) ->
+  paper = Raphael 'plane', window.innerWidth-16, window.innerHeight-92
+  model = new Rolemodel paper
+  $.each roles, (index, role) ->
+    model.draw 150*index+80, 160, 0.5+index/10
 
-jQuery ($) ->
+$ ->
+  $("#create").click ->
+    $("#roleform").show()
 
-  role = new Rolemodel Raphael("plane", 720, 400)
-  role.draw(180,90)
+  jQuery.getJSON 'roles', (data) ->
+    drawroles(data)

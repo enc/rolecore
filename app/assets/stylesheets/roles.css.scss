@@ -1,3 +1,39 @@
 // Place all the styles related to the roles controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.role {
+  $rwidth: 140px;
+  position: static;
+
+  div.container {
+    position: absolute;
+    border-style: solid;
+    border-radius: 10px;
+    width: $rwidth;
+    height: 90px;
+    border-width: 1px;
+    padding: 1em;
+  }
+  div.signal {
+    left: $rwidth + 4px;
+    position: absolute;
+    border-style: solid;
+    border-top-right-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-width: 1px;
+    background-color: hsl(0, 100%, 61%);
+  }
+}
+#roleform {
+  border: solid 1px;
+  border-radius: 10px;
+  padding: 10px;
+  position: absolute;
+  left: 200px;
+  top: 100px;
+  display: none;
+  backgroud-color: white;
+  box-shadow: 5px 5px 5px #ccc;
+  z-index: 50;
+}

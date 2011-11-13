@@ -8,6 +8,7 @@ gem 'rails', '3.1.1'
 # gem 'sqlite3'
 gem 'mysql2'
 gem 'haml-rails'
+gem 'formtastic'
 
 
 # Gems used only for assets and not required
@@ -34,9 +35,15 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
-gem 'rspec-rails', :group => [:test, :development]
+group :test, :development do
+  gem 'rspec-rails'
+  gem 'launchy'
+  # gem 'capybara-webkit'
+  gem 'rb-fsevent'
+end
 group :test do
   # Pretty printed test output
+  gem 'pry'
   gem 'turn', :require => false
   gem 'capybara'
   gem 'guard-rspec'
