@@ -4,18 +4,25 @@
 
 
 class Role
-  constructor: (@paper, @role) ->
+  constructor: (@role) ->
     @baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
     @signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
 
 
-  draw:  ->
+  draw: (@paper) ->
+    unless @role.xOffset?
+      @role.xOffset = 0
+    unless @role.yOffset?
+      @role.yOffset = 0
+    @role.scale = 0.5
+
     @base = @paper.path(@baseFrame)
     @base.translate @role.xOffset, @role.yOffset
     @base.attr
       fill: "rgb(232, 224, 156)"
       opacity: 0.5
     @base.scale @role.scale, @role.scale, 0, 0
+    @base.drag @move, @mreset, null, @
 
     @edge = @paper.path @signalEdge
     @edge.translate @role.xOffset, @role.yOffset
@@ -28,13 +35,21 @@ class Role
       'font-size': 18*@role.scale
     # label.translate xOffset, yOffset
 
-  move: (x, y) ->
-    @base.translate x,y
-    @edge.translate x,y
-    @label.translate x+(-90*@role.scale),y+(-55*@role.scale)
-    [@x, @y] = [x, y]
+  mreset: ->
+    console.log("Path attr #{@base.attr "x"}")
+    @x = 0
+    @y = 0
+    @xl = @label.attr("x")
+    @yl = @label.attr("y")
 
-  position: (x,y) ->
+  move: (dx, dy) ->
+    @base.translate (dx - @x)*2, (dy - @y)*2
+    @edge.translate (dx - @x)*2, (dy - @y)*2
+    @label.translate (dx - @x), (dy - @y)
+    @x = dx
+    @y = dy
+
+  position: (x,y,event) ->
     if x? and y?
       @move x,y
     else
@@ -48,20 +63,20 @@ class PlaneManager
     [100, 200]
 
   add_object: (item) ->
-    item.draw @freespace(), 0.5
+    item.draw @paper
 
 drawroles = (roles) ->
   $('#plane').empty()
   paper = new PlaneManager('plane')
-  model = new Rolemodel paper
   $.each roles, (index, role) ->
-    model.draw 150*index+80, 160, 0.5+index/10
+    paper.add_object new Role(role)
 
 window.redraw = ->
   jQuery.getJSON 'roles', (data) ->
     drawroles(data)
 
 $ ->
+  # standart callbacks
   $("#create").click ->
     $("#roleform").show()
 

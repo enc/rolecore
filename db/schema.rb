@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111007091020) do
+ActiveRecord::Schema.define(:version => 20111119125301) do
 
   create_table "relation_properties", :force => true do |t|
     t.integer  "relation_id"
@@ -32,6 +32,8 @@ ActiveRecord::Schema.define(:version => 20111007091020) do
     t.integer  "weight"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "xOffset"
+    t.integer  "yOffset"
   end
 
   create_table "tasks", :force => true do |t|
