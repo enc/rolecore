@@ -1,3 +1,5 @@
+global = exports ? this
+
 Raphael.fn.connection = `function (obj1, obj2, line, bg) {
     if (obj1.line && obj1.from && obj1.to) {
         line = obj1;
@@ -92,7 +94,6 @@ class Role
     # label.translate xOffset, yOffset
 
   mreset: ->
-    console.log("Path attr #{@base.attr "x"}")
     @x = 0
     @y = 0
     @xl = @label.attr("x")
@@ -133,10 +134,7 @@ class PlaneManager
     @paper = Raphael @plane, window.innerWidth-16, window.innerHeight-92
     @connections = []
     @roles = {}
-    window.plane = this
-
-  plane: ->
-    return @paper
+    global.planemanager = this
 
   freespace: ->
     [100, 200]
@@ -145,27 +143,41 @@ class PlaneManager
     @roles[item.id] = item
     item.draw @paper
 
-  add_connnection: (item) ->
+  add_connection: (item) ->
     @connections.push item
+
+  drawroles: (roles) ->
+    pm = @
+    if @paper?
+      $.each roles, (index, role) ->
+        pm.add_role new Role(role)
+
+  drawconns: (conns) ->
+    pm = @
+    if @paper?
+      $.each conns, (index, conn) ->
+        pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
 
 class Connection
   constructor: (@parent, @child, @plane) ->
-    @con = @plane.connection @parent, @child, "#000"
+    @con = @plane.connection @parent.base, @child.base, "#fff"
     @parent.add_conn @con
     @child.add_conn @con
 
   refresh: ->
     @con = @plane.connection @con
 
-drawroles = (roles) ->
-  $('#plane').empty()
-  paper = new PlaneManager('plane')
-  $.each roles, (index, role) ->
-    paper.add_role new Role(role)
+
 
 window.redraw = ->
+  $('#plane').empty()
+  pm = new PlaneManager('plane')
   jQuery.getJSON 'roles', (data) ->
-    drawroles(data)
+    pm.drawroles(data)
+
+  jQuery.getJSON 'relations', (data) ->
+    console.log data
+    pm.drawconns(data)
 
 $ ->
   # standart callbacks
