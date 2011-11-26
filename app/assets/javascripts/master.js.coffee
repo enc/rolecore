@@ -1,7 +1,3 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
-
 Raphael.fn.connection = `function (obj1, obj2, line, bg) {
     if (obj1.line && obj1.from && obj1.to) {
         line = obj1;
@@ -63,6 +59,11 @@ class Role
     @baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
     @signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
     @id = @role.id
+    @cons = []
+
+
+  add_conn: (con) ->
+    @cons.push con
 
   draw: (@paper) ->
     unless @role.xOffset?
@@ -77,7 +78,7 @@ class Role
       fill: "rgb(232, 224, 156)"
       opacity: 0.5
     @base.scale @role.scale, @role.scale, 0, 0
-    @base.drag @move, @mreset, null, @
+    @base.drag @move, @mreset, @update, @, @, @
 
     @edge = @paper.path @signalEdge
     @edge.translate @role.xOffset, @role.yOffset
@@ -97,15 +98,28 @@ class Role
     @xl = @label.attr("x")
     @yl = @label.attr("y")
 
+  update: () ->
+    @role.xOffset += @x
+    @role.yOffset += @y
+    $.ajax
+      url: "roles/#{@role.id}"
+      dataType: 'json'
+      data: {role: @role}
+      type: "PUT"
+
+
+
   move: (dx, dy) ->
     @base.translate (dx - @x)*2, (dy - @y)*2
     @edge.translate (dx - @x)*2, (dy - @y)*2
     @label.translate (dx - @x), (dy - @y)
     @x = dx
     @y = dy
+    $.each @cons, (index,connection) ->
+      connection.refresh()
 
-  update: ->
-    jQuery.getJSON "role/#{@role.id}", (data) ->
+  refresh: ->
+    jQuery.getJSON "roles/#{@role.id}", (data) ->
       @role = data
 
   position: (x,y,event) ->
@@ -119,6 +133,7 @@ class PlaneManager
     @paper = Raphael @plane, window.innerWidth-16, window.innerHeight-92
     @connections = []
     @roles = {}
+    window.plane = this
 
   plane: ->
     return @paper
@@ -130,9 +145,17 @@ class PlaneManager
     @roles[item.id] = item
     item.draw @paper
 
+  add_connnection: (item) ->
+    @connections.push item
+
 class Connection
   constructor: (@parent, @child, @plane) ->
-    @plane.connection @parent, @child, "#000"
+    @con = @plane.connection @parent, @child, "#000"
+    @parent.add_conn @con
+    @child.add_conn @con
+
+  refresh: ->
+    @con = @plane.connection @con
 
 drawroles = (roles) ->
   $('#plane').empty()

@@ -1,5 +1,7 @@
 class Role < ActiveRecord::Base
 
+  attr_accessible :xOffset, :yOffset, :name, :weight
+
   has_many :relations, :foreign_key => :parent_id
   has_many :upper_relations, :class_name => "Relation", :foreign_key => :child_role_id
   has_many :upers, :through => :upper_relations, :source => :parent
