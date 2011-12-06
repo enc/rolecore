@@ -20,7 +20,7 @@ group :assets do
 end
 
 group :develoment do
-  gem 'pry'
+  gem 'pry-rails'
   gem 'rails3-generators'
 end
 
