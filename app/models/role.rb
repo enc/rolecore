@@ -7,9 +7,12 @@ class Role < ActiveRecord::Base
   has_many :upers, :through => :upper_relations, :source => :parent
   has_many :childs, :through => :relations, :source => :child_role
   has_many :tasks, :through => :relations, :source => :child_task
+  has_many :memberships
+  has_many :users, :through => :memberships
 
 
-  def as_json
+
+  def as_json options
     super(:methods => :task_count)
   end
   def add_subrole role
@@ -25,6 +28,10 @@ class Role < ActiveRecord::Base
 
   def all_tasks
     tasks + childs.all.collect { |i| i.all_tasks } .flatten
+  end
+
+  def hight
+    1 + childs.all.collect { |i| i.hight } .max
   end
 
   def task_count

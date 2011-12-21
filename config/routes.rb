@@ -1,4 +1,8 @@
 Rolecore::Application.routes.draw do
+  resources :memberships
+
+  resources :users
+
   resources :relations
 
   get "master/root"

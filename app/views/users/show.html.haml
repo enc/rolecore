@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Foreign:
+  = @user.foreign_id
+%p
+  %b Name:
+  = @user.name
+
+= link_to 'Edit', edit_user_path(@user)
+\|
+= link_to 'Back', users_path

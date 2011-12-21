@@ -52,78 +52,104 @@ Raphael.fn.connection = `function (obj1, obj2, line, bg) {
         };
     }
 };`
-class Role
-  constructor: (@role) ->
-    @baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
-    @signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
-    @id = @role.id
-    @cons = []
 
+createForm = (form, paper) ->
+  if typeof form == "string"
+    is_path = true
+    object = paper.path form
+  else
+    is_path = false
+    object = form
 
-  add_conn: (con) ->
-    @cons.push con
+  object.attr
+    fill: "rgb(232, 224, 156)"
+    opacity: 0.5
 
-  draw: (@paper) ->
-    unless @role.xOffset?
-      @role.xOffset = 0
-    unless @role.yOffset?
-      @role.yOffset = 0
-    @role.scale = 0.5
+  object.move = (dx,dy) ->
+      if is_path
+        object.translate dx * 2, dy * 2
+      else
+        object.translate dx, dy
 
-    @base = @paper.path(@baseFrame)
-    @base.translate @role.xOffset, @role.yOffset
-    @base.attr
-      fill: "rgb(232, 224, 156)"
-      opacity: 0.5
-    @base.scale @role.scale, @role.scale, 0, 0
-    @base.drag @move, @mreset, @update, @, @, @
+  object.size = (factor) ->
+    object.scale factor, factor, 0, 0
 
-    @edge = @paper.path @signalEdge
-    @edge.translate @role.xOffset, @role.yOffset
-    @edge.attr
-      fill: "rgb(255, 47, 0)"
-    @edge.scale @role.scale, @role.scale, 0, 0
+  object.changeColour = (colour) ->
+    @attr
+      fill: colour
 
-    @label = @paper.text @role.xOffset+(-90*@role.scale), @role.yOffset+(-55*@role.scale), @role.name
-    @label.attr
-      'font-size': 18*@role.scale
-    # label.translate xOffset, yOffset
+  return object
 
-  mreset: ->
-    @x = 0
-    @y = 0
-    @xl = @label.attr("x")
-    @yl = @label.attr("y")
+createRole = (role) ->
 
-  update: () ->
-    @role.xOffset += @x
-    @role.yOffset += @y
-    $.ajax
-      url: "roles/#{@role.id}"
-      dataType: 'json'
-      data: {role: @role}
-      type: "PUT"
+  baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
+  signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
+  clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
+  cons = []
 
+  return {
+    add_conn: (con) ->
+      cons.push con
 
+    id: ->
+      return role.id
 
-  move: (dx, dy) ->
-    @base.translate (dx - @x)*2, (dy - @y)*2
-    @edge.translate (dx - @x)*2, (dy - @y)*2
-    @label.translate (dx - @x), (dy - @y)
-    @x = dx
-    @y = dy
-    $.each @cons, (index,connection) ->
-      connection.refresh()
+    draw: (@paper) ->
+      unless role.xOffset?
+        role.xOffset = 0
+      unless role.yOffset?
+        role.yOffset = 0
+      role.scale = 0.5
 
-  refresh: ->
-    jQuery.getJSON "roles/#{@role.id}", (data) ->
-      @role = data
+      @base = createForm baseFrame, @paper
+      @base.move role.xOffset, role.yOffset
+      @base.size role.scale
+      @base.drag @move, @mreset, @update, @, @, @
 
-  position: (x,y,event) ->
-    if x? and y?
-      @move x,y
-    else
-      [@x,@y]
+      @edge = createForm signalEdge, @paper
+      @edge.move role.xOffset, role.yOffset
+      @edge.changeColour "rgb(255, 47, 0)"
+      @edge.size role.scale
+
+      @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
+      @label.attr
+        'font-size': 18*role.scale
+      # label.translate xOffset, yOffset
+
+    mreset: ->
+      @x = 0
+      @y = 0
+      @xl = @label.attr("x")
+      @yl = @label.attr("y")
+
+    update: () ->
+      role.xOffset += @x
+      role.yOffset += @y
+      $.ajax
+        url: "roles/#{role.id}"
+        dataType: 'json'
+        data: {role: role}
+        type: "PUT"
+
+    move: (dx, dy) ->
+      @base.move (dx - @x), (dy - @y)
+      @edge.move (dx - @x), (dy - @y)
+      @label.move (dx - @x), (dy - @y)
+      @x = dx
+      @y = dy
+      $.each @cons, (index,connection) ->
+        connection.refresh()
+
+    refresh: ->
+      jQuery.getJSON "roles/#{role.id}", (data) ->
+        role = data
+
+    position: (x,y,event) ->
+      if x? and y?
+        @move x,y
+      else
+        [@x,@y]
+  }
 
 class PlaneManager
   constructor: (@plane) ->
@@ -137,18 +163,16 @@ class PlaneManager
 
   add_role: (item) ->
     @roles[item.id] = item
-    console.log item.id
     item.draw @paper
 
   add_connection: (item) ->
-    console.log "Draw conn."
     @connections.push item
 
   drawroles: (roles) ->
     pm = @
     if @paper?
       $.each roles, (index, role) ->
-        pm.add_role new Role(role)
+        pm.add_role createRole(role)
 
   drawconns: (conns) ->
     pm = @
