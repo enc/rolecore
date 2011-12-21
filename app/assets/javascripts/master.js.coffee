@@ -65,6 +65,9 @@ createForm = (form, paper) ->
     fill: "rgb(232, 224, 156)"
     opacity: 0.5
 
+  object.adjust = (dx,dy) ->
+      object.translate dx * 2, dy * 2
+
   object.move = (dx,dy) ->
       if is_path
         object.translate dx * 2, dy * 2
@@ -102,18 +105,21 @@ createRole = (role) ->
       role.scale = 0.5
 
       @base = createForm baseFrame, @paper
-      @base.move role.xOffset, role.yOffset
+      @base.adjust role.xOffset, role.yOffset
       @base.size role.scale
       @base.drag @move, @mreset, @update, @, @, @
 
       @edge = createForm signalEdge, @paper
-      @edge.move role.xOffset, role.yOffset
+      @edge.adjust role.xOffset, role.yOffset
       @edge.changeColour "rgb(255, 47, 0)"
       @edge.size role.scale
 
-      @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
+      # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
+      @label = createForm @paper.text(0,0 , role.name), @paper
+      @label.adjust role.xOffset+(-45*role.scale), role.yOffset+(-23*role.scale)
       @label.attr
         'font-size': 18*role.scale
+      @label.changeColour "rgb(0,0,0)"
       # label.translate xOffset, yOffset
 
     mreset: ->
@@ -123,8 +129,8 @@ createRole = (role) ->
       @yl = @label.attr("y")
 
     update: () ->
-      role.xOffset += @x
-      role.yOffset += @y
+      role.xOffset += @x/2
+      role.yOffset += @y/2
       $.ajax
         url: "roles/#{role.id}"
         dataType: 'json'
@@ -137,7 +143,7 @@ createRole = (role) ->
       @label.move (dx - @x), (dy - @y)
       @x = dx
       @y = dy
-      $.each @cons, (index,connection) ->
+      $.each cons, (index,connection) ->
         connection.refresh()
 
     refresh: ->
@@ -162,7 +168,7 @@ class PlaneManager
     [100, 200]
 
   add_role: (item) ->
-    @roles[item.id] = item
+    @roles[item.id()] = item
     item.draw @paper
 
   add_connection: (item) ->
