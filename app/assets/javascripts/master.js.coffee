@@ -159,7 +159,10 @@ createRole = (role) ->
 
 class PlaneManager
   constructor: (@plane) ->
-    @paper = Raphael @plane, window.innerWidth-16, window.innerHeight-92
+    @x = window.innerWidth-16
+    @y = window.innerHeight-92
+    @scale = 1.0
+    @paper = Raphael @plane, @x, @y
     @connections = []
     @roles = {}
     global.planemanager = this
@@ -185,6 +188,31 @@ class PlaneManager
     if @paper?
       $.each conns, (index, conn) ->
         pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
+
+  move: (direction) ->
+    content = $('#plane svg')
+    @mt ||= parseInt(content.css('margin-top'))
+    @ml ||= parseInt(content.css('margin-left'))
+    switch direction
+      when "up" then @mt -= 50
+      when "down" then @mt += 50
+      when "left" then @ml -= 50
+      when "right" then @ml += 50
+    content.css('margin-top', @mt)
+    content.css('margin-left', @ml)
+
+  enlarge: ->
+    @scale -= 0.1
+    @resize()
+
+  shrink: ->
+    @scale += 0.1
+    @resize()
+
+  resize: ->
+    $('#plane svg').css('height', @x*@scale).css('width', @y * @scale)
+    @paper.setViewBox(0,0, @x * @scale, @y * @scale)
+
 
 class Connection
   constructor: (@parent, @child, @plane) ->

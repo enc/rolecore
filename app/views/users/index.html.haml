@@ -1,21 +1,21 @@
-%h1 Listing users
 
-%table
-  %tr
-    %th Foreign
-    %th Name
-    %th
-    %th
-    %th
+.container_16
+  .clear
+  .grid_3
 
-  - @users.each do |user|
-    %tr
-      %td= user.foreign_id
-      %td= user.name
-      %td= link_to 'Show', user
-      %td= link_to 'Edit', edit_user_path(user)
-      %td= link_to 'Destroy', user, :confirm => 'Are you sure?', :method => :delete
+    %h1 Listing users
 
-%br
+    %table
+      %tr
+        %th Name
 
-= link_to 'New User', new_user_path
+      - @users.each do |user|
+        %tr
+          %td= link_to user.name, user, remote: true
+
+    %br
+
+    = link_to 'New User', new_user_path
+
+  #user.grid_12.userbox
+    %h2 Userbox
