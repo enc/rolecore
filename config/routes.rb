@@ -1,4 +1,14 @@
 Rolecore::Application.routes.draw do
+  get "plane/show"
+
+  get "plane/update"
+
+  get "m_list/index"
+
+  resources :translations
+
+  resources :messages
+
   resources :memberships
 
   resources :users

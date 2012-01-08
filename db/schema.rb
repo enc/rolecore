@@ -11,11 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111206155618) do
+ActiveRecord::Schema.define(:version => 20120108103928) do
 
   create_table "memberships", :force => true do |t|
     t.integer  "user_id"
     t.integer  "role_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "messages", :force => true do |t|
+    t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -48,6 +54,16 @@ ActiveRecord::Schema.define(:version => 20111206155618) do
     t.string   "name"
     t.boolean  "sod"
     t.integer  "weight"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "xOffset"
+    t.integer  "yOffset"
+  end
+
+  create_table "translations", :force => true do |t|
+    t.string   "text"
+    t.string   "lang"
+    t.integer  "message_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

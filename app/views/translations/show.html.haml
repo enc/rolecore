@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Text:
+  = @translation.text
+%p
+  %b Lang:
+  = @translation.lang
+
+= link_to 'Edit', edit_translation_path(@translation)
+\|
+= link_to 'Back', translations_path

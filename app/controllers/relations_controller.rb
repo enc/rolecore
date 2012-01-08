@@ -24,10 +24,11 @@ class RelationsController < ApplicationController
   # GET /relations/new
   # GET /relations/new.json
   def new
-    @relation = Relation.new
+    @relation = Relation.new params[:role]
 
     respond_to do |format|
       format.html # new.html.erb
+      format.js
       format.json { render json: @relation }
     end
   end
@@ -45,6 +46,7 @@ class RelationsController < ApplicationController
     respond_to do |format|
       if @relation.save
         format.html { redirect_to @relation, notice: 'Relation was successfully created.' }
+        format.js
         format.json { render json: @relation, status: :created, location: @relation }
       else
         format.html { render action: "new" }

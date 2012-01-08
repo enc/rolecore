@@ -9,9 +9,9 @@ Raphael.fn.connection = `function (obj1, obj2, line, bg) {
     var bb1 = obj1.getBBox(),
         bb2 = obj2.getBBox(),
         p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
-        {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
-        {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
-        {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1}],
+             {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
+             {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
+             {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1}],
         d = {}, dis = [];
     for (var i = 0; i < 2; i++) {
         for (var j = 2; j < 4; j++) {
@@ -61,18 +61,15 @@ createForm = (form, paper) ->
     is_path = false
     object = form
 
-  object.attr
-    fill: "rgb(232, 224, 156)"
-    opacity: 0.5
-
   object.adjust = (dx,dy) ->
       object.translate dx * 2, dy * 2
 
-  object.move = (dx,dy) ->
-      if is_path
-        object.translate dx * 2, dy * 2
-      else
-        object.translate dx, dy
+  object.move = (dx,dy,factor) ->
+    if is_path
+      factor ||= 2
+    else
+      factor ||= 1
+    object.translate dx * factor, dy * factor
 
   object.size = (factor) ->
     object.scale factor, factor, 0, 0
@@ -83,11 +80,99 @@ createForm = (form, paper) ->
 
   return object
 
+createTask = (task) ->
+
+  baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
+  signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
+  clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
+  plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
+  cons = []
+  task.scale = 0.6
+
+  return {
+    add_conn: (con) ->
+      cons.push con
+
+    id: ->
+      return task.id
+
+    draw: (@paper) ->
+      unless task.xOffset?
+        task.xOffset = 0
+      unless task.yOffset?
+        task.yOffset = 0
+
+      @base = createForm clearFrame, @paper
+      @base.adjust task.xOffset, task.yOffset
+      @base.size task.scale
+      @base.drag @move, @mreset, @update, @, @, @
+      @base.attr
+        fill: "rgb(11, 121, 224)"
+        opacity: 0.8
+
+
+
+      # @plus = createForm plus, @paper
+      # @plus.adjust task.xOffset+(-52*task.scale), task.yOffset+(26*task.scale)
+      # @plus.changeColour "rgb(0, 0, 0)"
+      # @plus.size task.scale * 2
+      # @plus.toFront()
+      # @plus.click ->
+        # $.ajax
+          # url: 'relations/new'
+          # dataType: 'script'
+          # data:
+            # task:
+              # child_task_id: task.id
+
+      # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
+      @label = createForm @paper.text(0,0 , task.name), @paper
+      @label.adjust task.xOffset+(-60*task.scale)+(@label.getBBox().width*0.4*task.scale), task.yOffset+(-23*task.scale)
+      @label.attr
+        'font-size': 18*task.scale
+      @label.changeColour "rgb(0,0,0)"
+      # label.translate xOffset, yOffset
+
+    mreset: ->
+      @x = 0
+      @y = 0
+      @xl = @label.attr("x")
+      @yl = @label.attr("y")
+
+    update: () ->
+      task.xOffset += @x/2
+      task.yOffset += @y/2
+      $.ajax
+        url: "tasks/#{task.id}"
+        dataType: 'json'
+        data: {task: task}
+        type: "PUT"
+
+    move: (dx, dy) ->
+      @base.move (dx - @x), (dy - @y)
+      @label.move (dx - @x), (dy - @y)
+      # @plus.move (dx - @x), (dy - @y),1
+      @x = dx
+      @y = dy
+      # $.each cons, (index,connection) ->
+        # connection.refresh()
+
+    refresh: ->
+      jQuery.getJSON "tasks/#{task.id}", (data) ->
+        task = data
+
+    position: (x,y,event) ->
+      if x? and y?
+        @move x,y
+      else
+        [@x,@y]
+  }
 createRole = (role) ->
 
   baseFrame = "M129-21.5H77.5V-73l0.5,0.5h-194.5c-6.627,0-13,4.373-13,11v122 c0,6.627,6.373,13,13,13h234c6.627,0,11-6.373,11-13V-22"
   signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
+  plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
   cons = []
 
   return {
@@ -108,15 +193,40 @@ createRole = (role) ->
       @base.adjust role.xOffset, role.yOffset
       @base.size role.scale
       @base.drag @move, @mreset, @update, @, @, @
+      @base.attr
+        fill: "rgb(232, 224, 156)"
+        opacity: 0.5
+
 
       @edge = createForm signalEdge, @paper
       @edge.adjust role.xOffset, role.yOffset
-      @edge.changeColour "rgb(255, 47, 0)"
+      if role.score > 3
+        @edge.changeColour "rgb(255, 47, 0)"
+      else
+        if role.score == 0
+          @edge.changeColour "rgb(75, 203, 11)"
+        else
+          @edge.changeColour "rgb(203, 175, 11)"
+
+
       @edge.size role.scale
+
+      @plus = createForm plus, @paper
+      @plus.adjust role.xOffset+(-52*role.scale), role.yOffset+(26*role.scale)
+      @plus.changeColour "rgb(0, 0, 0)"
+      @plus.size role.scale * 2
+      @plus.toFront()
+      @plus.click ->
+        $.ajax
+          url: 'relations/new'
+          dataType: 'script'
+          data:
+            role:
+              parent_id: role.id
 
       # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
       @label = createForm @paper.text(0,0 , role.name), @paper
-      @label.adjust role.xOffset+(-45*role.scale), role.yOffset+(-23*role.scale)
+      @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(-23*role.scale)
       @label.attr
         'font-size': 18*role.scale
       @label.changeColour "rgb(0,0,0)"
@@ -141,6 +251,7 @@ createRole = (role) ->
       @base.move (dx - @x), (dy - @y)
       @edge.move (dx - @x), (dy - @y)
       @label.move (dx - @x), (dy - @y)
+      @plus.move (dx - @x), (dy - @y),1
       @x = dx
       @y = dy
       $.each cons, (index,connection) ->
@@ -165,10 +276,19 @@ class PlaneManager
     @paper = Raphael @plane, @x, @y
     @connections = []
     @roles = {}
+    @tasks = {}
     global.planemanager = this
+    $('#plane').width(@x).height(@y)
+    $(window).resize ->
+      $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
+
 
   freespace: ->
     [100, 200]
+
+  add_task: (item) ->
+    @tasks[item.id()] = item
+    item.draw @paper
 
   add_role: (item) ->
     @roles[item.id()] = item
@@ -176,6 +296,12 @@ class PlaneManager
 
   add_connection: (item) ->
     @connections.push item
+
+  drawtasks: (tasks) ->
+    pm = @
+    if @paper?
+      $.each tasks, (index, task) ->
+        pm.add_task createTask(task)
 
   drawroles: (roles) ->
     pm = @
@@ -188,6 +314,10 @@ class PlaneManager
     if @paper?
       $.each conns, (index, conn) ->
         pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
+
+  draw_connection: (pid, cid) ->
+    pm = @
+    pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
 
   move: (direction) ->
     content = $('#plane svg')
@@ -230,9 +360,11 @@ window.redraw = ->
   pm = new PlaneManager('plane')
   jQuery.getJSON 'roles', (data) ->
     pm.drawroles(data)
-    jQuery.getJSON 'relations', (data) ->
-      console.log data
-      pm.drawconns(data)
+  jQuery.getJSON 'tasks', (data) ->
+    pm.drawtasks(data)
+  jQuery.getJSON 'relations', (data) ->
+    console.log data
+    pm.drawconns(data)
 
 $ ->
   # standart callbacks

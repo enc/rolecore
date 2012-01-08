@@ -13,7 +13,7 @@ class Role < ActiveRecord::Base
 
 
   def as_json options
-    super(:methods => :task_count)
+    super(:methods => [:task_count,:score])
   end
   def add_subrole role
     rel = Relation.create
@@ -48,5 +48,9 @@ class Role < ActiveRecord::Base
     return -1 if (o_tasks.select { |i| r_tasks.include? i }).empty?
     return 1 if (r_tasks.select { |i| o_tasks.include? i }).empty?
     return 0
+  end
+
+  def score
+    rand 5
   end
 end

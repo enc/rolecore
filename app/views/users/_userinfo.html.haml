@@ -1,0 +1,17 @@
+.grid_4.prefix_1.alpha.border
+  %p
+    = @user.name
+  %p
+    = @user.info
+.grid_5.prefix_1.omega.border
+  = render :partial => 'roles/badge', :collection => @user.roles
+.clear
+.grid_4.alpha
+  %button
+    = link_to 'Destroy', @user, :confim => 'Are you sure?', :method => :delete
+.grid_5.prefix_1.omega
+  .border
+    = semantic_form_for @user, :remote => true do |f|
+      = f.inputs do
+        = f.input :roles
+      = f.buttons
