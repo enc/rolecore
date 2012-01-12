@@ -1,6 +1,7 @@
 class Plane
   def initialize
     roles = Role.all
+    tasks = Task.all
     @x = 0
     @y = 0
     roles.each do |role|
@@ -9,5 +10,13 @@ class Plane
     roles.each do |role|
       @y = role.yOffset if @y < role.yOffset
     end
+    tasks.each do |task|
+      @x = task.xOffset if @x < task.xOffset
+    end
+    tasks.each do |task|
+      @y = task.yOffset if @y < task.yOffset
+    end
+    @x += 150
+    @y += 100
   end
 end

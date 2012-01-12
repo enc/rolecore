@@ -8,36 +8,30 @@ Raphael.fn.connection = `function (obj1, obj2, line, bg) {
     }
     var bb1 = obj1.getBBox(),
         bb2 = obj2.getBBox(),
-        p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
-             {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
-             {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
-             {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1}],
+        p = [ {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
+             {x: bb2.x + bb2.width / 2, y: bb2.y - 1} ],
         d = {}, dis = [];
-    for (var i = 0; i < 2; i++) {
-        for (var j = 2; j < 4; j++) {
+    for (var i = 0; i < 1; i++) {
+        for (var j = 1; j < 2; j++) {
             var dx = Math.abs(p[i].x - p[j].x),
                 dy = Math.abs(p[i].y - p[j].y);
-            if ((i == j - 2) || (((i != 0 && j != 3) || p[i].y > p[j].y) && ((i != 1 && j != 2) || p[i].y < p[j].y))) {
+            if ((i == j - 1) || (((i != 0 && j != 2) || p[i].y > p[j].y) && ((i != 1 && j != 2) || p[i].y < p[j].y))) {
                 dis.push(dx + dy);
                 d[dis[dis.length - 1]] = [i, j];
             }
         }
     }
-    if (dis.length == 0) {
-        var res = [0, 2];
-    } else {
-        res = d[Math.min.apply(Math, dis)];
-    }
+    var res = [0, 1];
     var x1 = p[res[0]].x,
         y1 = p[res[0]].y,
         x4 = p[res[1]].x,
         y4 = p[res[1]].y;
     dx = Math.max(Math.abs(x1 - x4) / 2, 10);
     dy = Math.max(Math.abs(y1 - y4) / 2, 10);
-    var x2 = [x1, x1][res[0]].toFixed(3),
-        y2 = [y1 - dy, y1 + dy][res[0]].toFixed(3),
-        x3 = [0, 0, x4, x4 ][res[1]].toFixed(3),
-        y3 = [0, 0, y1 + dy, y1 - dy ][res[1]].toFixed(3);
+    var x2 = [x1][res[0]].toFixed(3),
+        y2 = [y1 + dy][res[0]].toFixed(3),
+        x3 = [0, x4 ][res[1]].toFixed(3),
+        y3 = [0, y1 + dy][res[1]].toFixed(3);
     var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
     if (line && line.line) {
         line.bg && line.bg.attr({path: path});
@@ -65,14 +59,16 @@ createForm = (form, paper) ->
       object.translate dx * 2, dy * 2
 
   object.move = (dx,dy,factor) ->
+    scale = factor if factor?
+    scale ||= 1
     if is_path
-      factor ||= 2
-    else
-      factor ||= 1
-    object.translate dx * factor, dy * factor
+      scale = 2
+    scale = scale * (0.5 / object.factor)
+    object.translate dx * scale, dy * scale
 
   object.size = (factor) ->
     object.scale factor, factor, 0, 0
+    object.factor = factor
 
   object.changeColour = (colour) ->
     @attr
@@ -211,6 +207,19 @@ createRole = (role) ->
 
       @edge.size role.scale
 
+      @aplus = createForm plus, @paper
+      @aplus.adjust role.xOffset, role.yOffset+(-28*role.scale)
+      @aplus.changeColour "rgb(0, 0, 0)"
+      @aplus.size role.scale * 2
+      @aplus.toFront()
+      @aplus.click ->
+        $.ajax
+          url: 'relations/new'
+          dataType: 'script'
+          data:
+            role:
+              child_role_id: role.id
+
       @plus = createForm plus, @paper
       @plus.adjust role.xOffset+(-52*role.scale), role.yOffset+(26*role.scale)
       @plus.changeColour "rgb(0, 0, 0)"
@@ -251,6 +260,7 @@ createRole = (role) ->
       @base.move (dx - @x), (dy - @y)
       @edge.move (dx - @x), (dy - @y)
       @label.move (dx - @x), (dy - @y)
+      @aplus.move (dx - @x), (dy - @y),1
       @plus.move (dx - @x), (dy - @y),1
       @x = dx
       @y = dy
@@ -317,7 +327,7 @@ class PlaneManager
 
   draw_connection: (pid, cid) ->
     pm = @
-    pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
+    pm.add_connection new Connection pm.roles[pid], pm.roles[cid], pm.paper
 
   move: (direction) ->
     content = $('#plane svg')
@@ -346,9 +356,12 @@ class PlaneManager
 
 class Connection
   constructor: (@parent, @child, @plane) ->
-    @con = @plane.connection @parent.base, @child.base, "#000"
-    @parent.add_conn @
-    @child.add_conn @
+    if @child?
+      @con = @plane.connection @parent.base, @child.base, "#000"
+      @parent.add_conn @
+      @child.add_conn @
+    else
+      console.log planemanager.roles
 
   refresh: ->
     @plane.connection @con
@@ -360,11 +373,10 @@ window.redraw = ->
   pm = new PlaneManager('plane')
   jQuery.getJSON 'roles', (data) ->
     pm.drawroles(data)
-  jQuery.getJSON 'tasks', (data) ->
-    pm.drawtasks(data)
-  jQuery.getJSON 'relations', (data) ->
-    console.log data
-    pm.drawconns(data)
+    jQuery.getJSON 'tasks', (data) ->
+      pm.drawtasks(data)
+    jQuery.getJSON 'relations', (data) ->
+      pm.drawconns(data)
 
 $ ->
   # standart callbacks
