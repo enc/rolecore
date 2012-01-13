@@ -1,4 +1,6 @@
 Rolecore::Application.routes.draw do
+  resources :badges
+
   get "plane/show"
 
   get "plane/update"

@@ -59,12 +59,12 @@ createForm = (form, paper) ->
       object.translate dx * 2, dy * 2
 
   object.move = (dx,dy,factor) ->
-    scale = factor if factor?
-    scale ||= 1
+    osize = factor if factor?
+    osize ||= 1
     if is_path
-      scale = 2
-    scale = scale * (0.5 / object.factor)
-    object.translate dx * scale, dy * scale
+      osize = 2
+    osize = osize * (0.5 / object.factor)
+    object.translate dx * osize, dy * osize
 
   object.size = (factor) ->
     object.scale factor, factor, 0, 0
@@ -236,6 +236,7 @@ createRole = (role) ->
       # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
       @label = createForm @paper.text(0,0 , role.name), @paper
       @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(-23*role.scale)
+      @label.size role.size
       @label.attr
         'font-size': 18*role.scale
       @label.changeColour "rgb(0,0,0)"

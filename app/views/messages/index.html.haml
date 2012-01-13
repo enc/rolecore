@@ -2,12 +2,14 @@
 
 %table
   %tr
+    %th Description
     %th
     %th
     %th
 
   - @messages.each do |message|
     %tr
+      %td= message.description
       %td= link_to 'Show', message
       %td= link_to 'Edit', edit_message_path(message)
       %td= link_to 'Destroy', message, :confirm => 'Are you sure?', :method => :delete
