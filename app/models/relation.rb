@@ -8,12 +8,10 @@ class Relation < ActiveRecord::Base
     return @objects if @objects
     @objects = Array.new
     if child_role
-      @objects.push child_role
       @objects.push child_role.childs
       @objects.push child_role.uppers
     end
     if parent
-      @objects.push parent
       @objects.push parent.childs
       @objects.push parent.uppers
     end

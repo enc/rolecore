@@ -16,7 +16,7 @@ class Plane
     tasks.each do |task|
       @y = task.yOffset if @y < task.yOffset
     end
-    @x += 150
-    @y += 100
+    @x = @x * 2 + 150
+    @y = @y * 2 + 100
   end
 end

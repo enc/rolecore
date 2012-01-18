@@ -1,4 +1,5 @@
-module Checker
+class Checker
+
 
   def self.register rule
     @@rules ||= Array.new
@@ -10,4 +11,9 @@ module Checker
       rule.new.check role
     end
   end
+
+  # register all rules here manually...
+  [
+    ManyChilds
+  ].each(&:register)
 end

@@ -7,7 +7,8 @@
           %li= msg
 
   = f.inputs do
-    = f.input :parent, :as => :select, :collection => Role.all
+    = f.input :parent, :as => :select, :collection => Role.all.reject { |i| @relation.linked.include? i }
     = f.input :child_role, :as => :select, :collection => Role.all.reject { |i| @relation.linked.include? i }
+    = f.input :child_task, :as => :select, :collection => Task.all
   = f.buttons
 

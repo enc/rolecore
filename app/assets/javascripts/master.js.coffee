@@ -67,8 +67,8 @@ createForm = (form, paper) ->
     object.translate dx * osize, dy * osize
 
   object.size = (factor) ->
-    object.scale factor, factor, 0, 0
     object.factor = factor
+    object.scale factor, factor, 0, 0
 
   object.changeColour = (colour) ->
     @attr
@@ -83,7 +83,7 @@ createTask = (task) ->
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
   plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
   cons = []
-  task.scale = 0.6
+  task.scale = 0.5
 
   return {
     add_conn: (con) ->
@@ -124,6 +124,7 @@ createTask = (task) ->
       # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
       @label = createForm @paper.text(0,0 , task.name), @paper
       @label.adjust task.xOffset+(-60*task.scale)+(@label.getBBox().width*0.4*task.scale), task.yOffset+(-23*task.scale)
+      @label.factor = task.scale
       @label.attr
         'font-size': 18*task.scale
       @label.changeColour "rgb(0,0,0)"
@@ -150,8 +151,8 @@ createTask = (task) ->
       # @plus.move (dx - @x), (dy - @y),1
       @x = dx
       @y = dy
-      # $.each cons, (index,connection) ->
-        # connection.refresh()
+      $.each cons, (index,connection) ->
+        connection.refresh()
 
     refresh: ->
       jQuery.getJSON "tasks/#{task.id}", (data) ->
@@ -170,6 +171,7 @@ createRole = (role) ->
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
   plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
   cons = []
+  state = 1
 
   return {
     add_conn: (con) ->
@@ -185,62 +187,108 @@ createRole = (role) ->
         role.yOffset = 0
       role.scale = 0.5
 
-      @base = createForm baseFrame, @paper
-      @base.adjust role.xOffset, role.yOffset
-      @base.size role.scale
-      @base.drag @move, @mreset, @update, @, @, @
-      @base.attr
-        fill: "rgb(232, 224, 156)"
-        opacity: 0.5
+      if state == 1
+        @base = createForm baseFrame, @paper
+        @base.adjust role.xOffset, role.yOffset
+        @base.size role.scale
+        @base.drag @move, @mreset, @update, @, @, @
+        @base.attr
+          fill: "rgb(232, 224, 156)"
+          opacity: 0.5
 
 
-      @edge = createForm signalEdge, @paper
-      @edge.adjust role.xOffset, role.yOffset
-      if role.score > 3
-        @edge.changeColour "rgb(255, 47, 0)"
-      else
-        if role.score == 0
-          @edge.changeColour "rgb(75, 203, 11)"
+        @edge = createForm signalEdge, @paper
+        @edge.adjust role.xOffset, role.yOffset
+        if role.score > 3
+          @edge.changeColour "rgb(255, 47, 0)"
         else
-          @edge.changeColour "rgb(203, 175, 11)"
+          if role.score == 0
+            @edge.changeColour "rgb(75, 203, 11)"
+          else
+            @edge.changeColour "rgb(203, 175, 11)"
 
+        @edge.size role.scale
 
-      @edge.size role.scale
+        @aplus = createForm plus, @paper
+        @aplus.adjust role.xOffset, role.yOffset+(-28*role.scale)
+        @aplus.changeColour "rgb(0, 0, 0)"
+        @aplus.size role.scale * 2
+        @aplus.toFront()
+        @aplus.click ->
+          $.ajax
+            url: 'relations/new'
+            dataType: 'script'
+            data:
+              role:
+                child_role_id: role.id
+        @plus = createForm plus, @paper
+        @plus.adjust role.xOffset+(-52*role.scale), role.yOffset+(26*role.scale)
+        @plus.changeColour "rgb(0, 0, 0)"
+        @plus.size role.scale * 2
+        @plus.toFront()
+        @plus.click ->
+          $.ajax
+            url: 'relations/new'
+            dataType: 'script'
+            data:
+              role:
+                parent_id: role.id
 
-      @aplus = createForm plus, @paper
-      @aplus.adjust role.xOffset, role.yOffset+(-28*role.scale)
-      @aplus.changeColour "rgb(0, 0, 0)"
-      @aplus.size role.scale * 2
-      @aplus.toFront()
-      @aplus.click ->
-        $.ajax
-          url: 'relations/new'
-          dataType: 'script'
-          data:
-            role:
-              child_role_id: role.id
+        # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
+        @label = createForm @paper.text(0,0 , role.name), @paper
+        @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(-23*role.scale)
+        @label.factor = role.scale
+        @label.attr
+          'font-size': 18*role.scale
+        @label.changeColour "rgb(0,0,0)"
+        @label.dblclick ->
+          $.ajax
+            url: "roles/#{role.id}/edit"
+            dataType: 'script'
+        @task_i = createForm @paper.rect 0, 0, 65, 65
+        @task_i.adjust role.xOffset+(20*role.scale), role.yOffset+(-4*role.scale)
+        @task_i.changeColour "rgb(227, 224, 38)"
+        @task_i.size role.scale
+        @task_i.attr
+          'opacity': 0.7
+          'text': "4"
+          'font-size': 18*role.scale
+          'stroke-width': 0
+        @t_label = createForm @paper.text(0,0 , role.task_count), @paper
+        @t_label.adjust role.xOffset+(36*role.scale), role.yOffset+(12*role.scale)
+        @t_label.factor = role.scale
+        @t_label.attr
+          'font-size': 45*role.scale
+        @t_label.changeColour "rgb(0,0,0)"
+      else
+        @base = createForm clearFrame, @paper
+        @base.adjust role.xOffset, role.yOffset
+        @base.size role.scale
+        @base.drag @move, @mreset, @update, @, @, @
+        @base.attr
+          fill: "rgb(232, 224, 156)"
+          opacity: 0.5
 
-      @plus = createForm plus, @paper
-      @plus.adjust role.xOffset+(-52*role.scale), role.yOffset+(26*role.scale)
-      @plus.changeColour "rgb(0, 0, 0)"
-      @plus.size role.scale * 2
-      @plus.toFront()
-      @plus.click ->
-        $.ajax
-          url: 'relations/new'
-          dataType: 'script'
-          data:
-            role:
-              parent_id: role.id
+        @label = createForm @paper.text(0,0 , role.name), @paper
+        @label.adjust role.xOffset+(-40*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(0*role.scale)
+        @label.factor = role.scale
+        @label.attr
+          'font-size': 28*role.scale
+        @label.changeColour "rgb(0,0,0)"
+        @label.dblclick ->
+          $.ajax
+            url: "roles/#{role.id}/edit"
+            dataType: 'script'
 
-      # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
-      @label = createForm @paper.text(0,0 , role.name), @paper
-      @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(-23*role.scale)
-      @label.size role.size
-      @label.attr
-        'font-size': 18*role.scale
-      @label.changeColour "rgb(0,0,0)"
-      # label.translate xOffset, yOffset
+    clear: ->
+      @base.remove()
+      @label.remove()
+      @edge.remove() if @edge?
+      @plus.remove() if @plus?
+      @aplus.remove() if @aplus?
+      @task_i.remove() if @task_i?
+      @t_label.remove() if @t_label?
+
 
     mreset: ->
       @x = 0
@@ -261,8 +309,10 @@ createRole = (role) ->
       @base.move (dx - @x), (dy - @y)
       @edge.move (dx - @x), (dy - @y)
       @label.move (dx - @x), (dy - @y)
+      @t_label.move (dx - @x), (dy - @y)
       @aplus.move (dx - @x), (dy - @y),1
       @plus.move (dx - @x), (dy - @y),1
+      @task_i.move (dx - @x), (dy - @y),2
       @x = dx
       @y = dy
       $.each cons, (index,connection) ->
@@ -284,14 +334,26 @@ class PlaneManager
     @x = window.innerWidth-16
     @y = window.innerHeight-92
     @scale = 1.0
-    @paper = Raphael @plane, @x, @y
-    @connections = []
-    @roles = {}
-    @tasks = {}
-    global.planemanager = this
-    $('#plane').width(@x).height(@y)
-    $(window).resize ->
+    jQuery.getJSON 'plane/show', (data) =>
+      @dimensions = data
+      console.log @dimensions
+      @paper = Raphael @plane, @dimensions.x, @dimensions.y
+      @connections = []
+      @roles = {}
+      @tasks = {}
+      global.planemanager = this
+      $('#plane').width(@x).height(@y)
       $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
+      $('#upcont').css('left',((window.innerWidth-16)/2)-16)
+      $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
+      $('#left').css('top',((window.innerHeight-92)/2))
+      $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
+      $(window).resize ->
+        $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
+        $('#upcont').css('left',((window.innerWidth-16)/2)-16)
+        $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
+        $('#left').css('top',((window.innerHeight-92)/2))
+        $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
 
 
   freespace: ->
@@ -324,11 +386,20 @@ class PlaneManager
     pm = @
     if @paper?
       $.each conns, (index, conn) ->
-        pm.add_connection new Connection pm.roles[conn.parent_id], pm.roles[conn.child_role_id], pm.paper
+        if conn.child_role_id?
+          obj = pm.roles[conn.child_role_id]
+        else
+          obj = pm.tasks[conn.child_task_id]
 
-  draw_connection: (pid, cid) ->
+        pm.add_connection new Connection pm.roles[conn.parent_id], obj, pm.paper
+
+  draw_connection: (pid, cid, tid) ->
     pm = @
-    pm.add_connection new Connection pm.roles[pid], pm.roles[cid], pm.paper
+    if cid?
+      obj = pm.roles[cid]
+    else
+      obj = pm.tasks[tid]
+    pm.add_connection new Connection pm.roles[pid], obj, pm.paper
 
   move: (direction) ->
     content = $('#plane svg')
@@ -376,8 +447,8 @@ window.redraw = ->
     pm.drawroles(data)
     jQuery.getJSON 'tasks', (data) ->
       pm.drawtasks(data)
-    jQuery.getJSON 'relations', (data) ->
-      pm.drawconns(data)
+      jQuery.getJSON 'relations', (data) ->
+        pm.drawconns(data)
 
 $ ->
   # standart callbacks

@@ -1,10 +1,11 @@
 class ManyChilds < Rule
 
-  def ckeck role
-    if role.childs < 5
+  def check role
+    if role.all_childs.count >= 5
       badge = Badge.new
       badge.role = role
-      bage.message = Message.find 1
+      badge.score = role.all_childs.count - 4
+      badge.message = Message.find 1
       badge.save
     end
   end

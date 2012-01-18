@@ -1,8 +1,5 @@
 class Rule
 
-  def initialize
-    Checker.register self
-  end
   ###################################################################
 
   @@rules = Set.new

@@ -1,3 +1,42 @@
 // Place all the styles related to the Plane controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.direction {
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+
+}
+
+#upcont {
+  z-index: 100;
+  height: 32px;
+  position: absolute;
+  width: 96px;
+}
+#right {
+  background-image: url(arrow_right.png);
+}
+#left {
+  background-image: url(arrow_left.png);
+}
+#up {
+  background-image: url(arrow_up.png);
+  position: static;
+  float: right;
+}
+#down {
+  background-image: url(arrow_down.png);
+}
+#in {
+  background-image: url(plus.png);
+  position: static;
+  float: right;
+}
+#out {
+  background-image: url(minus.png);
+  position: static;
+  float: left;
+}

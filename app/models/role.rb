@@ -15,8 +15,14 @@ class Role < ActiveRecord::Base
 
 
   def as_json options
-    super(:methods => [:task_count,:score])
+    super(:methods => [:task_count,:score,:task_count])
   end
+
+  def <=> comp
+    self.id <=> comp.id
+  end
+
+
   def add_subrole role
     rel = Relation.create
     rel.child_role = role
@@ -29,7 +35,7 @@ class Role < ActiveRecord::Base
   end
 
   def all_tasks
-    tasks + childs.all.collect { |i| i.all_tasks } .flatten
+    tasks + childs.all.collect { |i| i.all_tasks } .flatten.uniq
   end
 
   def hight
@@ -37,7 +43,7 @@ class Role < ActiveRecord::Base
   end
 
   def task_count
-    all_tasks.count
+    all_tasks.uniq.count
   end
 
   def all_childs
@@ -53,6 +59,8 @@ class Role < ActiveRecord::Base
   end
 
   def score
-    rand 5
+    value = 0
+    badges.each { |badge| value += badge.score }
+    return value
   end
 end
