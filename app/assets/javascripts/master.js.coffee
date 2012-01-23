@@ -40,7 +40,7 @@ Raphael.fn.connection = `function (obj1, obj2, line, bg) {
         var color = typeof line == "string" ? line : "#000";
         return {
             bg: bg && bg.split && this.path(path).attr({stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3}),
-            line: this.path(path).attr({stroke: color, fill: "none"}),
+            line: this.path(path).attr({stroke: color, fill: "none", 'stroke-width': 2, opacity: 0.4}),
             from: obj1,
             to: obj2
         };
@@ -59,12 +59,13 @@ createForm = (form, paper) ->
       object.translate dx * 2, dy * 2
 
   object.move = (dx,dy,factor) ->
+    gfactor = window.planemanager.scale
     osize = factor if factor?
     osize ||= 1
     if is_path
       osize = 2
     osize = osize * (0.5 / object.factor)
-    object.translate dx * osize, dy * osize
+    object.translate dx * osize * gfactor, dy * osize * gfactor
 
   object.size = (factor) ->
     object.factor = factor
@@ -180,6 +181,16 @@ createRole = (role) ->
     id: ->
       return role.id
 
+    refresh: ->
+      if global.planemanager.scale > 0.6
+        state = 1
+      else
+        state = 0
+      $.getJSON "roles/#{role.id}", (data) ->
+        role = data
+        @clear()
+        @draw(global.planemanager.paper)
+
     draw: (@paper) ->
       unless role.xOffset?
         role.xOffset = 0
@@ -208,6 +219,12 @@ createRole = (role) ->
             @edge.changeColour "rgb(203, 175, 11)"
 
         @edge.size role.scale
+        @edge.dblclick ->
+          $.ajax
+            url: 'badges'
+            dataType: 'script'
+            data:
+              role_id: role.id
 
         @aplus = createForm plus, @paper
         @aplus.adjust role.xOffset, role.yOffset+(-28*role.scale)
@@ -333,11 +350,13 @@ class PlaneManager
   constructor: (@plane) ->
     @x = window.innerWidth-16
     @y = window.innerHeight-92
+    @mt ||= 0
+    @ml ||= 0
     @scale = 1.0
     jQuery.getJSON 'plane/show', (data) =>
       @dimensions = data
       console.log @dimensions
-      @paper = Raphael @plane, @dimensions.x, @dimensions.y
+      @paper = Raphael @plane, @x, @y
       @connections = []
       @roles = {}
       @tasks = {}
@@ -348,7 +367,11 @@ class PlaneManager
       $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
       $('#left').css('top',((window.innerHeight-92)/2))
       $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
-      $(window).resize ->
+      $(window).resize =>
+        # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
+        @paper.setSize(@x, @y)
+        @x = window.innerWidth-16
+        @y = window.innerHeight-92
         $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
         $('#upcont').css('left',((window.innerWidth-16)/2)-16)
         $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
@@ -386,32 +409,26 @@ class PlaneManager
     pm = @
     if @paper?
       $.each conns, (index, conn) ->
-        if conn.child_role_id?
-          obj = pm.roles[conn.child_role_id]
-        else
-          obj = pm.tasks[conn.child_task_id]
+        pm.add_connection new Connection pm.paper, conn
 
-        pm.add_connection new Connection pm.roles[conn.parent_id], obj, pm.paper
-
-  draw_connection: (pid, cid, tid) ->
+  draw_connection: (relation) ->
     pm = @
-    if cid?
-      obj = pm.roles[cid]
-    else
-      obj = pm.tasks[tid]
-    pm.add_connection new Connection pm.roles[pid], obj, pm.paper
+    pm.add_connection new Connection  pm.paper, relation
 
   move: (direction) ->
-    content = $('#plane svg')
-    @mt ||= parseInt(content.css('margin-top'))
-    @ml ||= parseInt(content.css('margin-left'))
+    # content = $('#plane svg')
+    # @mt ||= parseInt(content.css('margin-top'))
+    # @ml ||= parseInt(content.css('margin-left'))
+    @mt ||= 0
+    @ml ||= 0
     switch direction
       when "up" then @mt -= 50
       when "down" then @mt += 50
-      when "left" then @ml -= 50
-      when "right" then @ml += 50
-    content.css('margin-top', @mt)
-    content.css('margin-left', @ml)
+      when "left" then @ml += 50
+      when "right" then @ml -= 50
+    # content.animate({'margin-top': @mt},'fast')
+    # content.animate({'margin-left': @ml},'fast')
+    @resize()
 
   enlarge: ->
     @scale -= 0.1
@@ -422,18 +439,30 @@ class PlaneManager
     @resize()
 
   resize: ->
-    $('#plane svg').css('height', @x*@scale).css('width', @y * @scale)
-    @paper.setViewBox(0,0, @x * @scale, @y * @scale)
+    # $('#plane svg').css('height', @y*@scale).css('width', @x * @scale)
+    @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale, false)
+    # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
+    console.log "Scale: #{@scale} x:#{@x} y:#{@y}"
 
 
 class Connection
-  constructor: (@parent, @child, @plane) ->
-    if @child?
+  constructor: (@plane, @relation) ->
+    pm = global.planemanager
+    if @relation?
+      @parent = pm.roles[@relation.parent_id]
+      if @relation.child_role_id?
+        @child = pm.roles[@relation.child_role_id]
+      else
+        @child = pm.tasks[@relation.child_task_id]
       @con = @plane.connection @parent.base, @child.base, "#000"
       @parent.add_conn @
       @child.add_conn @
     else
       console.log planemanager.roles
+    @con.line.dblclick =>
+      $.ajax
+        url: "relations/#{@relation.id}/edit"
+        dataType: 'script'
 
   refresh: ->
     @plane.connection @con

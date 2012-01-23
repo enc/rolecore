@@ -1,0 +1,7 @@
+%ul
+  - @badges.each do |item|
+    %li
+      = item.message.description
+  - if @badges.empty?
+    %li
+      Keine Hinweise!

@@ -2,10 +2,15 @@ class BadgesController < ApplicationController
   # GET /badges
   # GET /badges.json
   def index
-    @badges = Badge.all
+    if params.key? :role_id
+      @badges = Badge.find_all_by_role_id params[:role_id]
+    else
+      @badges = Badge.all
+    end
 
     respond_to do |format|
       format.html # index.html.erb
+      format.js
       format.json { render json: @badges }
     end
   end
