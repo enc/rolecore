@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120113154546) do
+ActiveRecord::Schema.define(:version => 20120123182725) do
 
   create_table "badges", :force => true do |t|
     t.integer  "score"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(:version => 20120113154546) do
     t.integer  "child_task_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "context"
   end
 
   create_table "roles", :force => true do |t|

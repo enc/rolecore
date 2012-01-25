@@ -7,8 +7,15 @@ class Checker
   end
 
   def self.check role
+    role.badges.delete_all
     @@rules.each do |rule|
       rule.new.check role
+    end
+  end
+
+  def self.check_all
+    Role.all.each do |role|
+      self.check role
     end
   end
 
