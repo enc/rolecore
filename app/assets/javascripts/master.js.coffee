@@ -262,7 +262,7 @@ createRole = (role) ->
           $.ajax
             url: "roles/#{role.id}/edit"
             dataType: 'script'
-        @task_i = createForm @paper.rect 0, 0, 65, 65
+        @task_i = createForm @paper.rect 0, 0, 55, 55
         @task_i.adjust role.xOffset+(20*role.scale), role.yOffset+(-4*role.scale)
         @task_i.changeColour "rgb(227, 224, 38)"
         @task_i.size role.scale
@@ -272,11 +272,28 @@ createRole = (role) ->
           'font-size': 18*role.scale
           'stroke-width': 0
         @t_label = createForm @paper.text(0,0 , role.task_count), @paper
-        @t_label.adjust role.xOffset+(36*role.scale), role.yOffset+(12*role.scale)
+        @t_label.adjust role.xOffset+(33*role.scale), role.yOffset+(9*role.scale)
         @t_label.factor = role.scale
         @t_label.attr
           'font-size': 45*role.scale
         @t_label.changeColour "rgb(0,0,0)"
+
+        if role.user_count > 0
+          @user_i = createForm @paper.rect 0, 0, 55, 55
+          @user_i.adjust role.xOffset+(-50*role.scale), role.yOffset+(-12*role.scale)
+          @user_i.changeColour "rgb(42, 108, 213)"
+          @user_i.size role.scale
+          @user_i.attr
+            'opacity': 0.5
+            'text': "4"
+            'font-size': 18*role.scale
+            'stroke-width': 0
+          @u_label = createForm @paper.text(0,0 , role.user_count), @paper
+          @u_label.adjust role.xOffset+(-37*role.scale), role.yOffset+(2*role.scale)
+          @u_label.factor = role.scale
+          @u_label.attr
+            'font-size': 45*role.scale
+          @u_label.changeColour "rgb(0,0,0)"
       else
         @base = createForm clearFrame, @paper
         @base.adjust role.xOffset, role.yOffset
@@ -327,9 +344,11 @@ createRole = (role) ->
       @edge.move (dx - @x), (dy - @y)
       @label.move (dx - @x), (dy - @y)
       @t_label.move (dx - @x), (dy - @y)
+      @u_label.move (dx - @x), (dy - @y) if @u_label?
       @aplus.move (dx - @x), (dy - @y),1
       @plus.move (dx - @x), (dy - @y),1
       @task_i.move (dx - @x), (dy - @y),2
+      @user_i.move (dx - @x), (dy - @y),2 if @user_i?
       @x = dx
       @y = dy
       $.each cons, (index,connection) ->

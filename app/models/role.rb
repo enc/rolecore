@@ -15,7 +15,7 @@ class Role < ActiveRecord::Base
 
 
   def as_json options
-    super(:methods => [:task_count,:score,:task_count])
+    super(:methods => [:task_count,:score,:task_count,:user_count])
   end
 
   def <=> comp
@@ -32,6 +32,10 @@ class Role < ActiveRecord::Base
 
   def add_task task
     self.tasks << task
+  end
+
+  def user_count
+    users.count
   end
 
   def all_tasks
