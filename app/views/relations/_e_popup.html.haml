@@ -1,4 +1,8 @@
-#relform.dynform
-  .form
-    = render 'relations/e_form'
-  .close
+#relform.modal.fade.in
+  .modal-header
+    %a.close x
+    %h3 Bastel mir die Rolle
+  .modal-body
+    .form
+      = render 'relations/e_form'
+  .modal-footer

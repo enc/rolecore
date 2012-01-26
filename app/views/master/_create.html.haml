@@ -1,4 +1,4 @@
 %h2 Create New
 %div.button.vert
-  = button_to "Role", new_role_path, :remote => true, :method => :get
-  = button_to "Task", new_task_path, :remote => true, :method => :get
+  = link_to "Role", new_role_path, :remote => true, :method => :get, :class => "btn primary"
+  = link_to "Task", new_task_path, :remote => true, :method => :get, :class => "btn primary"
