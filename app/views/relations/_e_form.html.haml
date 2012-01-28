@@ -10,5 +10,6 @@
   = f.association :child_role, :as => :select, :collection => Role.all.reject { |i| @relation.linked.include? i }
   = f.association :child_task, :as => :select, :collection => Task.all
   = f.input :context, :input_html => { :rows => '5' }
-  = f.button :submit, :class => 'btn'
+  = f.button :submit, :class => 'btn primary'
+  = link_to 'Delete', @relation, :confim => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger"
 

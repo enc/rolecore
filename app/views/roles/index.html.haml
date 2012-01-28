@@ -1,21 +1,15 @@
-%h1 Listing roles
+.container-fluid
+  .sidebar
+    .well
+      %h3 Listing roles
 
-%table
-  %tr
-    %th Name
-    %th Weight
-    %th
-    %th
-    %th
+      %ul
+        - @roles.each do |role|
+          %li
+            = role.name
+            = link_to 'Open', edit_role_path(role), :remote => true , :class => 'btn small'
 
-  - @roles.each do |role|
-    %tr
-      %td= role.name
-      %td= role.weight
-      %td= link_to 'Show', role
-      %td= link_to 'Edit', edit_role_path(role)
-      %td= link_to 'Destroy', role, :confirm => 'Are you sure?', :method => :delete
 
-%br
-
-= link_to 'New Role', new_role_path
+      = link_to 'New Role', new_role_path, :remote => true , :class => 'btn primary'
+  #role.content
+    Rollen

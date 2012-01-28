@@ -1,3 +1,4 @@
+%h3 Create new User
 = simple_form_for @user do |f|
   -if @user.errors.any?
     #error_explanation
@@ -6,6 +7,6 @@
         - @user.errors.full_messages.each do |msg|
           %li= msg
 
-    = f.input :foreign_id
-    = f.input :name
-    = f.button :submit
+  = f.input :foreign_id
+  = f.input :name
+  = f.button :submit, :class => 'btn primary'

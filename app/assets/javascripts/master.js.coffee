@@ -368,7 +368,7 @@ createRole = (role) ->
 class PlaneManager
   constructor: (@plane) ->
     @x = window.innerWidth-16
-    @y = window.innerHeight-92
+    @y = window.innerHeight-22
     @mt ||= 0
     @ml ||= 0
     @scale = 1.0
@@ -376,7 +376,7 @@ class PlaneManager
       @dimensions = data
       console.log @dimensions
       @paper = Raphael @plane, @x, @y
-      @connections = []
+      @connections = {}
       @roles = {}
       @tasks = {}
       global.planemanager = this
@@ -410,7 +410,8 @@ class PlaneManager
     item.draw @paper
 
   add_connection: (item) ->
-    @connections.push item
+    console.log item.id()
+    @connections[item.id()] = item
 
   drawtasks: (tasks) ->
     pm = @
@@ -433,6 +434,13 @@ class PlaneManager
   draw_connection: (relation) ->
     pm = @
     pm.add_connection new Connection  pm.paper, relation
+
+  remove_conn: (id) ->
+    if @connections[id]?
+      @connections[id].remove()
+      @connections[id] = undefined
+
+
 
   move: (direction) ->
     # content = $('#plane svg')
@@ -486,17 +494,24 @@ class Connection
   refresh: ->
     @plane.connection @con
 
+  remove: ->
+    @con.line.remove()
+
+  id: ->
+    @relation.id
+
 
 
 window.redraw = ->
-  $('#plane').empty()
-  pm = new PlaneManager('plane')
-  jQuery.getJSON 'roles', (data) ->
-    pm.drawroles(data)
-    jQuery.getJSON 'tasks', (data) ->
-      pm.drawtasks(data)
-      jQuery.getJSON 'relations', (data) ->
-        pm.drawconns(data)
+  if $('#plane').length != 0
+    $('#plane').empty()
+    pm = new PlaneManager('plane')
+    jQuery.getJSON 'roles', (data) ->
+      pm.drawroles(data)
+      jQuery.getJSON 'tasks', (data) ->
+        pm.drawtasks(data)
+        jQuery.getJSON 'relations', (data) ->
+          pm.drawconns(data)
 
 $ ->
   # standart callbacks

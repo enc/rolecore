@@ -13,6 +13,10 @@ class Checker
     end
   end
 
+  def self.rules
+    @@rules
+  end
+
   def self.check_all
     Role.all.each do |role|
       self.check role
@@ -21,6 +25,7 @@ class Checker
 
   # register all rules here manually...
   [
-    ManyChilds
+    ManyChilds,
+    NoTasks
   ].each(&:register)
 end

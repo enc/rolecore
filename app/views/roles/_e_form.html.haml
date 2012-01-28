@@ -1,14 +1,14 @@
-= semantic_form_for @role, :remote => true do |f|
-  = f.inputs do
-    = f.input :name
-
-  = f.buttons do
-    = f.commit_button :label => "Update"
-.border
-  %ul
-    - @role.all_tasks.each do |task|
-      %li
-        .task_container
-          .task
+.row
+  .span5
+    = simple_form_for @role, :remote => true do |f|
+      = f.input :name
+      = f.button :submit, :class => 'btn primary'
+  .span4
+    %h4 Task related
+    %ul
+      - @role.all_tasks.each do |task|
+        %li
+          .task_container
+            .task
             = task.name
 

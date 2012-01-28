@@ -1,0 +1,43 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:charset => "utf-8"}/
+    %title Rolecore
+    %meta{:content => "", :name => "description"}/
+    %meta{:content => "", :name => "author"}/
+    / Le HTML5 shim, for IE6-8 support of HTML elements
+    /[if lt IE 9]
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    / Le styles
+    = stylesheet_link_tag    "application"
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+    / Le fav and touch icons
+    %link{:href => "images/favicon.ico", :rel => "shortcut icon"}/
+    %link{:href => "images/apple-touch-icon.png", :rel => "apple-touch-icon"}/
+    %link{:href => "images/apple-touch-icon-72x72.png", :rel => "apple-touch-icon", :sizes => "72x72"}/
+    %link{:href => "images/apple-touch-icon-114x114.png", :rel => "apple-touch-icon", :sizes => "114x114"}/
+  %body
+    .topbar
+      .topbar-inner
+        .container-fluid
+          %a.brand{:href => "/"} Rolecore
+          %ul.nav
+            %li.active
+              %a{:href => "/"} Home
+            %li
+              = link_to "User", users_path
+            %li
+              = link_to "Rollen", roles_path
+            %li.dropdown{:'data-dropdown' => "dropdown"}
+              %a.dropdown-toggle{:href => "#"} Erstellen
+              %ul.dropdown-menu
+                %li
+                  = link_to "Role", new_role_path, :remote => true, :method => :get
+                %li
+                  = link_to "Task", new_task_path, :remote => true, :method => :get
+          %p.pull-right
+            Logged in as
+            %a{:href => "#"} username
+    .frame
+      = yield
