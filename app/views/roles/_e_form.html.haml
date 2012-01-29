@@ -3,7 +3,7 @@
     = simple_form_for @role, :remote => true do |f|
       = f.input :name
       = f.button :submit, :class => 'btn primary'
-      = link_to 'Delete', @role, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger"
+      = link_to 'Delete', @role, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger" if @role.persisted?
   .span4
     %h4 Task related
     %ul

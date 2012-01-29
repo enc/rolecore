@@ -184,6 +184,12 @@ createRole = (role) ->
     remove_conn: (id) ->
       delete cons[id]
 
+    remove_relations: ->
+      console.log "Connections killing"
+      $.each cons, (index, connection) ->
+        console.log connection
+        connection.remove()
+
     id: ->
       return role.id
 
@@ -456,7 +462,11 @@ class PlaneManager
       @connections[id].remove()
       delete @connections[id]
 
-
+  remove_role: (id) ->
+    role = @roles[id]
+    role.remove_relations()
+    role.clear()
+    delete @roles[id]
 
   move: (direction) ->
     # content = $('#plane svg')
@@ -467,8 +477,8 @@ class PlaneManager
     switch direction
       when "up" then @mt -= 50
       when "down" then @mt += 50
-      when "left" then @ml += 50
-      when "right" then @ml -= 50
+      when "left" then @ml -= 50
+      when "right" then @ml += 50
     # content.animate({'margin-top': @mt},'fast')
     # content.animate({'margin-left': @ml},'fast')
     @resize()

@@ -79,12 +79,14 @@ class RolesController < ApplicationController
   # DELETE /roles/1.json
   def destroy
     @role = Role.find(params[:id])
-    @role.badges.delete_all
-    @role.relations.delete_all
+    @role.badges.destroy_all
+    @role.relations.destroy_all
+    @role.upper_relations.destroy_all
     @role.destroy
 
     respond_to do |format|
       format.html { redirect_to roles_url }
+      format.js
       format.json { head :ok }
     end
   end
