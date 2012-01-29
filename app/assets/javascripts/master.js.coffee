@@ -83,12 +83,15 @@ createTask = (task) ->
   signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
   plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
-  cons = []
+  cons = {}
   task.scale = 0.5
 
   return {
     add_conn: (con) ->
-      cons.push con
+      cons[con.id()] = con
+
+    remove_conn: (id) ->
+      delete cons[id]
 
     id: ->
       return task.id
@@ -124,7 +127,7 @@ createTask = (task) ->
 
       # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
       @label = createForm @paper.text(0,0 , task.name), @paper
-      @label.adjust task.xOffset+(-60*task.scale)+(@label.getBBox().width*0.4*task.scale), task.yOffset+(-23*task.scale)
+      @label.adjust task.xOffset+(-60*task.scale)+(@label.getBBox().width*0.6*task.scale), task.yOffset+(-14*task.scale)
       @label.factor = task.scale
       @label.attr
         'font-size': 18*task.scale
@@ -171,15 +174,27 @@ createRole = (role) ->
   signalEdge = "M129-21.5H77.5V-73l0.5,0.5h39.5c6.627,0,11,4.373,11,11V-22"
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
   plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
-  cons = []
-  state = 1
+  cons = {}
+  state = true
 
   return {
     add_conn: (con) ->
-      cons.push con
+      cons[con.id()] = con
+
+    remove_conn: (id) ->
+      delete cons[id]
 
     id: ->
       return role.id
+
+    toggle: (want) ->
+      if want?
+        state = want
+      else
+        if state
+          state = false
+        else
+          state = true
 
     refresh: ->
       if global.planemanager.scale > 0.6
@@ -198,7 +213,7 @@ createRole = (role) ->
         role.yOffset = 0
       role.scale = 0.5
 
-      if state == 1
+      if state
         @base = createForm baseFrame, @paper
         @base.adjust role.xOffset, role.yOffset
         @base.size role.scale
@@ -253,17 +268,17 @@ createRole = (role) ->
 
         # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
         @label = createForm @paper.text(0,0 , role.name), @paper
-        @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(-23*role.scale)
+        @label.adjust role.xOffset+(-60*role.scale)+(@label.getBBox().width*0.6*role.scale), role.yOffset+(-14*role.scale)
         @label.factor = role.scale
         @label.attr
-          'font-size': 18*role.scale
+          'font-size': 24*role.scale
         @label.changeColour "rgb(0,0,0)"
         @label.dblclick ->
           $.ajax
             url: "roles/#{role.id}/edit"
             dataType: 'script'
         @task_i = createForm @paper.rect 0, 0, 55, 55
-        @task_i.adjust role.xOffset+(20*role.scale), role.yOffset+(-4*role.scale)
+        @task_i.adjust role.xOffset+(27*role.scale), role.yOffset+(4*role.scale)
         @task_i.changeColour "rgb(227, 224, 38)"
         @task_i.size role.scale
         @task_i.attr
@@ -272,7 +287,7 @@ createRole = (role) ->
           'font-size': 18*role.scale
           'stroke-width': 0
         @t_label = createForm @paper.text(0,0 , role.task_count), @paper
-        @t_label.adjust role.xOffset+(33*role.scale), role.yOffset+(9*role.scale)
+        @t_label.adjust role.xOffset+(40*role.scale), role.yOffset+(17*role.scale)
         @t_label.factor = role.scale
         @t_label.attr
           'font-size': 45*role.scale
@@ -280,7 +295,7 @@ createRole = (role) ->
 
         if role.user_count > 0
           @user_i = createForm @paper.rect 0, 0, 55, 55
-          @user_i.adjust role.xOffset+(-50*role.scale), role.yOffset+(-12*role.scale)
+          @user_i.adjust role.xOffset+(-38*role.scale), role.yOffset+(4*role.scale)
           @user_i.changeColour "rgb(42, 108, 213)"
           @user_i.size role.scale
           @user_i.attr
@@ -289,7 +304,7 @@ createRole = (role) ->
             'font-size': 18*role.scale
             'stroke-width': 0
           @u_label = createForm @paper.text(0,0 , role.user_count), @paper
-          @u_label.adjust role.xOffset+(-37*role.scale), role.yOffset+(2*role.scale)
+          @u_label.adjust role.xOffset+(-25*role.scale), role.yOffset+(17*role.scale)
           @u_label.factor = role.scale
           @u_label.attr
             'font-size': 45*role.scale
@@ -304,10 +319,10 @@ createRole = (role) ->
           opacity: 0.5
 
         @label = createForm @paper.text(0,0 , role.name), @paper
-        @label.adjust role.xOffset+(-40*role.scale)+(@label.getBBox().width*0.4*role.scale), role.yOffset+(0*role.scale)
+        @label.adjust role.xOffset, role.yOffset
         @label.factor = role.scale
         @label.attr
-          'font-size': 28*role.scale
+          'font-size': 48*role.scale
         @label.changeColour "rgb(0,0,0)"
         @label.dblclick ->
           $.ajax
@@ -322,6 +337,8 @@ createRole = (role) ->
       @aplus.remove() if @aplus?
       @task_i.remove() if @task_i?
       @t_label.remove() if @t_label?
+      @user_i.remove() if @task_i?
+      @u_label.remove() if @t_label?
 
 
     mreset: ->
@@ -410,7 +427,6 @@ class PlaneManager
     item.draw @paper
 
   add_connection: (item) ->
-    console.log item.id()
     @connections[item.id()] = item
 
   drawtasks: (tasks) ->
@@ -438,7 +454,7 @@ class PlaneManager
   remove_conn: (id) ->
     if @connections[id]?
       @connections[id].remove()
-      @connections[id] = undefined
+      delete @connections[id]
 
 
 
@@ -476,6 +492,7 @@ class Connection
   constructor: (@plane, @relation) ->
     pm = global.planemanager
     if @relation?
+      console.log @relation.id
       @parent = pm.roles[@relation.parent_id]
       if @relation.child_role_id?
         @child = pm.roles[@relation.child_role_id]
@@ -496,6 +513,8 @@ class Connection
 
   remove: ->
     @con.line.remove()
+    @child.remove_conn(@relation.id)
+    @parent.remove_conn(@relation.id)
 
   id: ->
     @relation.id

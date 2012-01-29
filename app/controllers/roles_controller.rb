@@ -79,6 +79,8 @@ class RolesController < ApplicationController
   # DELETE /roles/1.json
   def destroy
     @role = Role.find(params[:id])
+    @role.badges.delete_all
+    @role.relations.delete_all
     @role.destroy
 
     respond_to do |format|

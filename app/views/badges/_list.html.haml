@@ -1,6 +1,10 @@
 %ul
   - @badges.each do |item|
     %li
+      - if item.score <= 3
+        %span.label.warning Warnung
+      - else
+        %span.label.important Achtung
       = item.message.description
   - if @badges.empty?
     %li

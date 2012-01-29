@@ -1,2 +1,2 @@
 $('#formcontainer').append('<%= escape_javascript(render('badges/popup'))%>');
-$('#relform').show().find('.close').click(function() { $(this).parent().remove() });
+$('#relform').modal('show').bind('hidden', function() { $(this).remove(); });

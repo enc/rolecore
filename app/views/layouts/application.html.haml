@@ -1,5 +1,5 @@
 !!!
-%html{:lang => "en"}
+%html{:lang => "de"}
   %head
     %meta{:charset => "utf-8"}/
     %title Rolecore
@@ -36,6 +36,8 @@
                   = link_to "Role", new_role_path, :remote => true, :method => :get
                 %li
                   = link_to "Task", new_task_path, :remote => true, :method => :get
+            %li
+              %a{:href => '#', :onClick => "redraw(); return false;"} Update
           %p.pull-right
             Logged in as
             %a{:href => "#"} username

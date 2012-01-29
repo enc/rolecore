@@ -1,1 +1,2 @@
-$("#roleform").html('<%= escape_javascript(render('tasks/form'))%>').modal('show');
+$("#roleform").html('<%= escape_javascript(render('tasks/popup'))%>')
+$("#relform").modal('show').bind('hidden', function() {$(this).remove()});

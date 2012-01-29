@@ -11,5 +11,5 @@
   = f.association :child_task, :as => :select, :collection => Task.all
   = f.input :context, :input_html => { :rows => '5' }
   = f.button :submit, :class => 'btn primary'
-  = link_to 'Delete', @relation, :confim => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger"
+  = link_to 'Delete', @relation, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger"
 
