@@ -96,6 +96,10 @@ createTask = (task) ->
     id: ->
       return task.id
 
+    redraw: ->
+      @clear()
+      @draw(@paper)
+
     draw: (@paper) ->
       unless task.xOffset?
         task.xOffset = 0
@@ -125,14 +129,12 @@ createTask = (task) ->
             # task:
               # child_task_id: task.id
 
-      # @label = createForm @paper.text(role.xOffset+(-90*role.scale), role.yOffset+(-55*role.scale), role.name), @paper
       @label = createForm @paper.text(0,0 , task.name), @paper
-      @label.adjust task.xOffset+(-60*task.scale)+(@label.getBBox().width*0.6*task.scale), task.yOffset+(-14*task.scale)
+      @label.adjust task.xOffset, task.yOffset
       @label.factor = task.scale
       @label.attr
-        'font-size': 18*task.scale
+        'font-size': 48*task.scale
       @label.changeColour "rgb(0,0,0)"
-      # label.translate xOffset, yOffset
 
     mreset: ->
       @x = 0
@@ -202,15 +204,11 @@ createRole = (role) ->
         else
           state = true
 
-    refresh: ->
-      if global.planemanager.scale > 0.6
-        state = 1
-      else
-        state = 0
-      $.getJSON "roles/#{role.id}", (data) ->
+    refdesh: ->
+      $.getJSON "roles/#{role.id}", (data) =>
         role = data
         @clear()
-        @draw(global.planemanager.paper)
+        @draw(@paper)
 
     draw: (@paper) ->
       unless role.xOffset?
@@ -232,12 +230,12 @@ createRole = (role) ->
         @edge = createForm signalEdge, @paper
         @edge.adjust role.xOffset, role.yOffset
         if role.score > 3
-          @edge.changeColour "rgb(255, 47, 0)"
+          @edge.changeColour "rgb(255, 26, 26)"
         else
           if role.score == 0
-            @edge.changeColour "rgb(75, 203, 11)"
+            @edge.changeColour "rgb(129, 255, 36)"
           else
-            @edge.changeColour "rgb(203, 175, 11)"
+            @edge.changeColour "rgb(255, 220, 26)"
 
         @edge.size role.scale
         @edge.dblclick ->
@@ -334,17 +332,33 @@ createRole = (role) ->
           $.ajax
             url: "roles/#{role.id}/edit"
             dataType: 'script'
+      $.each cons, (index, conn) =>
+        conn.roleupdate()
 
     clear: ->
       @base.remove()
       @label.remove()
-      @edge.remove() if @edge?
-      @plus.remove() if @plus?
-      @aplus.remove() if @aplus?
-      @task_i.remove() if @task_i?
-      @t_label.remove() if @t_label?
-      @user_i.remove() if @task_i?
-      @u_label.remove() if @t_label?
+      if @edge?
+        @edge.remove() 
+        delete @edge
+      if @plus?
+        @plus.remove()
+        delete @plus
+      if @aplus?
+        @aplus.remove() 
+        delete @aplus
+      if @task_i?
+        @task_i.remove() 
+        delete @task_i
+      if @t_label?
+        @t_label.remove() 
+        delete @t_label
+      if @user_i?
+        @user_i.remove() 
+        delete @user_i
+      if @u_label?
+        @u_label.remove() 
+        delete @u_label
 
 
     mreset: ->
@@ -363,14 +377,15 @@ createRole = (role) ->
         type: "PUT"
 
     move: (dx, dy) ->
+      console.log "#{dx}, #{dy}"
       @base.move (dx - @x), (dy - @y)
-      @edge.move (dx - @x), (dy - @y)
+      @edge.move (dx - @x), (dy - @y) if @edge?
       @label.move (dx - @x), (dy - @y)
-      @t_label.move (dx - @x), (dy - @y)
+      @t_label.move (dx - @x), (dy - @y) if @t_label?
       @u_label.move (dx - @x), (dy - @y) if @u_label?
-      @aplus.move (dx - @x), (dy - @y),1
-      @plus.move (dx - @x), (dy - @y),1
-      @task_i.move (dx - @x), (dy - @y),2
+      @aplus.move (dx - @x), (dy - @y),1 if @aplus
+      @plus.move (dx - @x), (dy - @y),1 if @plus?
+      @task_i.move (dx - @x), (dy - @y),2 if @task_i?
       @user_i.move (dx - @x), (dy - @y),2 if @user_i?
       @x = dx
       @y = dy
@@ -395,34 +410,52 @@ class PlaneManager
     @mt ||= 0
     @ml ||= 0
     @scale = 1.0
-    jQuery.getJSON 'plane/show', (data) =>
-      @dimensions = data
-      console.log @dimensions
-      @paper = Raphael @plane, @x, @y
-      @connections = {}
-      @roles = {}
-      @tasks = {}
-      global.planemanager = this
-      $('#plane').width(@x).height(@y)
+    @small = false
+    @draw()
+
+
+  draw: ->
+    @paper = Raphael @plane, @x, @y
+    @connections = {}
+    @roles = {}
+    @tasks = {}
+    global.planemanager = this
+    $('#plane').width(@x).height(@y)
+    $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
+    $('#upcont').css('left',((window.innerWidth-16)/2)-16)
+    $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
+    $('#left').css('top',((window.innerHeight-92)/2))
+    $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
+    @resize()
+    $(window).resize =>
+      # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
+      @paper.setSize(@x, @y)
+      @x = window.innerWidth-16
+      @y = window.innerHeight-92
       $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
       $('#upcont').css('left',((window.innerWidth-16)/2)-16)
       $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
       $('#left').css('top',((window.innerHeight-92)/2))
       $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
-      $(window).resize =>
-        # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
-        @paper.setSize(@x, @y)
-        @x = window.innerWidth-16
-        @y = window.innerHeight-92
-        $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
-        $('#upcont').css('left',((window.innerWidth-16)/2)-16)
-        $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
-        $('#left').css('top',((window.innerHeight-92)/2))
-        $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
+    jQuery.getJSON 'roles', (data) =>
+      @drawroles(data)
+      jQuery.getJSON 'tasks', (data) =>
+        @drawtasks(data)
+        jQuery.getJSON 'relations', (data) =>
+          @drawconns(data)
+
+  redraw: ->
+    @paper.remove()
+    @draw()
+
 
 
   freespace: ->
     [100, 200]
+
+  refresh: ->
+    $.each @roles, (index, role) ->
+      role.refdesh()
 
   add_task: (item) ->
     @tasks[item.id()] = item
@@ -485,16 +518,26 @@ class PlaneManager
 
   enlarge: ->
     @scale -= 0.1
+    if @scale < 1.7 and @small
+      @small = false
+      $.each @roles, (index, role) =>
+        role.toggle(true)
+        role.clear()
+        role.draw(@paper)
     @resize()
 
   shrink: ->
     @scale += 0.1
+    if @scale > 1.7 and not @small
+      @small = true
+      $.each @roles, (index, role) =>
+        role.toggle(false)
+        role.clear()
+        role.draw(@paper)
     @resize()
 
   resize: ->
-    # $('#plane svg').css('height', @y*@scale).css('width', @x * @scale)
     @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale, false)
-    # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
     console.log "Scale: #{@scale} x:#{@x} y:#{@y}"
 
 
@@ -526,6 +569,10 @@ class Connection
     @child.remove_conn(@relation.id)
     @parent.remove_conn(@relation.id)
 
+  roleupdate: ->
+    @con.line.remove()
+    @con = @plane.connection @parent.base, @child.base, "#000"
+
   id: ->
     @relation.id
 
@@ -535,12 +582,6 @@ window.redraw = ->
   if $('#plane').length != 0
     $('#plane').empty()
     pm = new PlaneManager('plane')
-    jQuery.getJSON 'roles', (data) ->
-      pm.drawroles(data)
-      jQuery.getJSON 'tasks', (data) ->
-        pm.drawtasks(data)
-        jQuery.getJSON 'relations', (data) ->
-          pm.drawconns(data)
 
 $ ->
   # standart callbacks
