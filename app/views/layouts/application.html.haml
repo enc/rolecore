@@ -37,7 +37,7 @@
                 %li
                   = link_to "Task", new_task_path, :remote => true, :method => :get
             %li
-              %a{:href => '#', :onClick => "redraw(); return false;"} Update
+              %a{:href => '#', :onClick => "planemanager.redraw(); return false;"} Update
           %p.pull-right
             Logged in as
             %a{:href => "#"} username

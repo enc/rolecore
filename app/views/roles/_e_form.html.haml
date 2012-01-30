@@ -1,15 +1,21 @@
+.span6
+  = simple_form_for @role, :remote => true do |f|
+    = f.input :name
+    = f.association :users
+    = f.button :submit, :class => 'btn primary'
+    = link_to 'Delete', @role, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger" if @role.persisted?
+%hr
 .row
-  .span5
-    = simple_form_for @role, :remote => true do |f|
-      = f.input :name
-      = f.button :submit, :class => 'btn primary'
-      = link_to 'Delete', @role, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger" if @role.persisted?
-  .span4
+  .span3
     %h4 Task related
     %ul
       - @role.all_tasks.each do |task|
         %li
-          .task_container
-            .task
-            = task.name
+          = task.name
 
+  .span3
+    %h4 Role Members
+    %ul
+      - @role.users.each do |user|
+        %li
+          = user.name

@@ -1,6 +1,6 @@
 class Role < ActiveRecord::Base
 
-  attr_accessible :xOffset, :yOffset, :name, :weight
+  attr_accessible :xOffset, :yOffset, :name, :weight, :user_ids
 
   has_many :badges
   has_many :message, :through => :badges

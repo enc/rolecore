@@ -10,11 +10,11 @@
     %ul
       = render :partial => 'roles/badge', :collection => @user.roles
 .row
-  .span12
+  .well.span12
     %h4 User bearbeiten
-    = simple_form_for @user, :remote => true do |f|
+    = simple_form_for @user, :remote => true , :html => {:class => 'form-search' } do |f|
       = f.input :name
-      = f.association :roles
-      = f.button :submit, :class => 'btn primary small'
+      = f.association :roles, as: :check_boxes
+      = f.button :submit, :class => 'primary small'
       = link_to 'Delete', @user, :confim => 'Are you sure?', :method => :delete, :class => "btn danger small"
 

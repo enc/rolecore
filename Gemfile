@@ -9,7 +9,7 @@ gem 'rails', '3.2.0'
 gem 'mysql2'
 gem 'haml-rails'
 gem 'twitter-bootstrap-rails'
-gem 'simple_form'
+gem 'simple_form', :git => "https://github.com/plataformatec/simple_form.git"
 
 
 # Gems used only for assets and not required
