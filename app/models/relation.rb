@@ -15,6 +15,6 @@ class Relation < ActiveRecord::Base
       @objects.push parent.childs
       @objects.push parent.uppers
     end
-    @objects.flatten.uniq
+    @objects = @objects.flatten.uniq.delete_if {|item| [parent,child_role, child_task].include? item }
   end
 end
