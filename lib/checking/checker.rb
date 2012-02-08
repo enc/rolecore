@@ -27,6 +27,8 @@ class Checker
   [
     ManyChilds,
     NoTasks,
-    JuniorRole
+    JuniorRole,
+    ToHigh,
+    ManyMembers
   ].each(&:register)
 end
