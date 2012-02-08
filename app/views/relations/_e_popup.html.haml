@@ -1,7 +1,10 @@
 #relform.modal.fade.in
   .modal-header
-    %a.close x
-    %h3 Bastel mir die Rolle
+    %a.close{:'data-dismiss' => 'modal'} x
+    - if @relation.persisted?
+      %h3 Verbindung bearbeiten
+    - else
+      %h3 Verbindung erstellen
   .modal-body
     .form
       = render 'relations/e_form'

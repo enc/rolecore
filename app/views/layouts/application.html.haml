@@ -18,28 +18,28 @@
     %link{:href => "images/apple-touch-icon-72x72.png", :rel => "apple-touch-icon", :sizes => "72x72"}/
     %link{:href => "images/apple-touch-icon-114x114.png", :rel => "apple-touch-icon", :sizes => "114x114"}/
   %body
-    .topbar
-      .topbar-inner
+    .navbar.navbar-fixed-top
+      .navbar-inner
         .container-fluid
           %a.brand{:href => "/"} Rolecore
-          %ul.nav
-            %li.active
-              %a{:href => "/"} Home
-            %li
-              = link_to "User", users_path
-            %li
-              = link_to "Rollen", roles_path
-            %li.dropdown{:'data-dropdown' => "dropdown"}
-              %a.dropdown-toggle{:href => "#"} Erstellen
-              %ul.dropdown-menu
-                %li
-                  = link_to "Role", new_role_path, :remote => true, :method => :get
-                %li
-                  = link_to "Task", new_task_path, :remote => true, :method => :get
-            %li
-              %a{:href => '#', :onClick => "planemanager.redraw(); return false;"} Update
-          %p.pull-right
-            Logged in as
-            %a{:href => "#"} username
+          .nav-collapse
+            %ul.nav
+              %li.active
+                %a{:href => "/"} Übersicht
+              %li
+                = link_to "Nutzer", users_path
+              %li
+                = link_to "Rollen", roles_path
+              %li.dropdown{:'data-dropdown' => "dropdown"}
+                %a.dropdown-toggle{:'data-toggle' => "dropdown", :href => "#"} 
+                  Erstellen
+                %ul.dropdown-menu
+                  %li
+                    = link_to "Rolle", new_role_path, :remote => true, :method => :get
+                  %li
+                    = link_to "Aufgabe", new_task_path, :remote => true, :method => :get
+              %li
+                %a{:href => '#', :onClick => "planemanager.redraw(); return false;"} Aktualisieren
+          / /.nav-collapse
     .frame
       = yield

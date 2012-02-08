@@ -2,18 +2,23 @@
 .container-fluid
   .sidebar
     .well
-      %h5 Listing users
+      %h5 Nuterliste
 
 
       %ul
         - @users.each do |user|
           %li
             %span.name= user.name
-            = link_to "Open" , user, remote: true, :class => 'btn small'
+            = link_to "Öffnen" , user, remote: true, :class => 'btn small'
 
       %br
 
-      = link_to 'New User', new_user_path, :remote => true , :class => 'btn primary'
+      = link_to 'Neuer Nutzer', new_user_path, :remote => true , :class => 'btn primary'
 
-  #user.content
-    %h2 Userbox
+  .content
+    -if notice
+      .alert-message.warning
+        %a.close{:'data-dismiss' => 'alert', :href => "#"} x
+        %p= notice
+    #user
+      %h2 Nutzer Info-Feld

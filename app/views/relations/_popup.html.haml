@@ -1,7 +1,7 @@
 #relform.modal.fade.in
   .modal-header
-    %a.close x
-    %h3 Create Relation
+    %a.close{:'data-dismiss' => 'modal'} x
+    %h3 Verbindung erstellen
   .modal-body
     = render 'relations/form'
   .modal-footer

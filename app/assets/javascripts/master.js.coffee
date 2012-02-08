@@ -426,7 +426,7 @@ class PlaneManager
     $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
     $('#left').css('top',((window.innerHeight-92)/2))
     $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
-    @resize()
+    @resize() if @scale != 1.0
     $(window).resize =>
       # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
       @paper.setSize(@x, @y)

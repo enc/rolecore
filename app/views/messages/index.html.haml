@@ -1,8 +1,8 @@
-%h1 Listing messages
+%h1 Liste der Hinweise
 
 %table
   %tr
-    %th Description
+    %th Hinweistext
     %th
     %th
     %th
@@ -10,10 +10,7 @@
   - @messages.each do |message|
     %tr
       %td= message.description
-      %td= link_to 'Show', message
-      %td= link_to 'Edit', edit_message_path(message)
-      %td= link_to 'Destroy', message, :confirm => 'Are you sure?', :method => :delete
+      %td= link_to 'Zeige', message
+      %td= link_to 'Bearbeiten', edit_message_path(message)
+      %td= link_to 'Löschen', message, :confirm => 'Sind Sie sicher?', :method => :delete
 
-%br
-
-= link_to 'New Message', new_message_path

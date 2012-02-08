@@ -1,7 +1,7 @@
 class JuniorRole < Rule
 
   def check role
-    Role.all.each do |target|
+    Role.all.reject { |rr| role.all_childs.include? rr} .each do |target|
       if is_junior target, role
         badge = Badge.new
         badge.role = role

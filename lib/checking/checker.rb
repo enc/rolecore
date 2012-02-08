@@ -26,6 +26,7 @@ class Checker
   # register all rules here manually...
   [
     ManyChilds,
-    NoTasks
+    NoTasks,
+    JuniorRole
   ].each(&:register)
 end

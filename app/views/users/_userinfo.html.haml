@@ -1,20 +1,20 @@
 .row
   .span6
-    %h3 User Informationen
+    %h3 Nutzer Informationen
     %p
       = @user.name
     %p
       = @user.info
   .span4
-    %h4 Rollen
+    %h4 Mitglied in folgenden Rollen
     %ul
       = render :partial => 'roles/badge', :collection => @user.roles
 .row
   .well.span12
-    %h4 User bearbeiten
+    %h4 Nutzer bearbeiten
     = simple_form_for @user, :remote => true , :html => {:class => 'form-search' } do |f|
       = f.input :name
       = f.association :roles, as: :check_boxes
       = f.button :submit, :class => 'primary small'
-      = link_to 'Delete', @user, :confim => 'Are you sure?', :method => :delete, :class => "btn danger small"
+      = link_to 'Löschen', @user, :confim => 'Sicher, dass Sie diesen Nutzer löschen wollen?', :method => :delete, :class => "btn danger small"
 

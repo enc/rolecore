@@ -1,6 +1,6 @@
 #relform.modal.hide.fade.in
   .modal-header
-    %a.close x
+    %a.close{:'data-dismiss' => 'modal'} x
     %h3 Hinweise
   .modal-body
     = render 'badges/list'
