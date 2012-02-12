@@ -291,7 +291,7 @@ createRole = (role) ->
           'font-size': 18*role.scale
           'stroke-width': 0
         @t_label = createForm @paper.text(0,0 , role.task_count), @paper
-        @t_label.adjust role.xOffset+(40*role.scale), role.yOffset+(17*role.scale)
+        @t_label.adjust role.xOffset+(40*role.scale), role.yOffset+(26*role.scale)
         @t_label.factor = role.scale
         @t_label.attr
           'font-size': 45*role.scale
@@ -308,7 +308,7 @@ createRole = (role) ->
             'font-size': 18*role.scale
             'stroke-width': 0
           @u_label = createForm @paper.text(0,0 , role.user_count), @paper
-          @u_label.adjust role.xOffset+(-25*role.scale), role.yOffset+(17*role.scale)
+          @u_label.adjust role.xOffset+(-25*role.scale), role.yOffset+(26*role.scale)
           @u_label.factor = role.scale
           @u_label.attr
             'font-size': 45*role.scale
@@ -406,7 +406,7 @@ createRole = (role) ->
 class PlaneManager
   constructor: (@plane) ->
     @x = window.innerWidth-16
-    @y = window.innerHeight-22
+    @y = window.innerHeight-52
     @mt ||= 0
     @ml ||= 0
     @scale = 1.0
@@ -421,11 +421,11 @@ class PlaneManager
     @tasks = {}
     global.planemanager = this
     $('#plane').width(@x).height(@y)
-    $('#plane').width(window.innerWidth-16).height(window.innerHeight-92)
+    $('#plane').width(window.innerWidth-16).height(window.innerHeight-52)
     $('#upcont').css('left',((window.innerWidth-16)/2)-16)
-    $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
-    $('#left').css('top',((window.innerHeight-92)/2))
-    $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
+    $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-22))
+    $('#left').css('top',((window.innerHeight-52)/2))
+    $('#right').css('top',((window.innerHeight-52)/2)).css('left',(window.innerWidth)-32)
     @resize() if @scale != 1.0
     $(window).resize =>
       # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)

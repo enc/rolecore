@@ -7,7 +7,7 @@ class Checker
   end
 
   def self.check role
-    role.badges.delete_all
+    role.badges.destroy_all
     @@rules.each do |rule|
       rule.new.check role
     end
@@ -29,6 +29,7 @@ class Checker
     NoTasks,
     JuniorRole,
     ToHigh,
-    ManyMembers
+    ManyMembers,
+    NoMembers
   ].each(&:register)
 end

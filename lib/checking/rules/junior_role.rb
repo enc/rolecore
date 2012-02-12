@@ -1,12 +1,14 @@
 class JuniorRole < Rule
 
   def check role
-    Role.all.reject { |rr| role.all_childs.include? rr} .each do |target|
+    checklist = Role.all.reject { |rr| role.all_uppers.include?(rr) or role.all_childs.include?(rr) }
+    checklist.each do |target|
       if is_junior target, role
         badge = Badge.new
         badge.role = role
         badge.score = 5
-        badge.message = Message.find 3
+        badge.message = Message.find(3)
+        badge.comment = " (Rolle: #{target.name})"
         badge.save
       end
     end

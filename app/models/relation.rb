@@ -4,6 +4,11 @@ class Relation < ActiveRecord::Base
   belongs_to :child_role, :class_name => "Role"
   belongs_to :child_task, :class_name => "Task"
 
+  after_save :check_roles
+  def check_roles
+    Checker.check_all
+  end
+
   def linked
     return @objects if @objects
     @objects = Array.new

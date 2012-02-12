@@ -1,11 +1,11 @@
 class ToHigh < Rule
 
   def check role
-    if role.hight >= 5
+    if role.hight >= 4
       badge = Badge.new
       badge.role = role
-      badge.score = 10
-      badge.message = Message.find 2
+      badge.score = 2
+      badge.message = Message.find 5
       badge.save
     end
   end

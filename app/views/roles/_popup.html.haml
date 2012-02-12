@@ -2,6 +2,10 @@
   .modal-header
     %a.close{:'data-dismiss' => 'modal'}
       x
-    %h3 Edit Role
+    -if @role.persisted?
+      %h3 Rolle bearbeiten
+    -else
+      %h3 Rolle erstellen
   .modal-body
     = render 'roles/e_form'
+  .mode-footer

@@ -4,18 +4,19 @@
     = f.association :users
     = f.button :submit, :class => 'btn primary'
     = link_to 'Delete', @role, :confirm => 'Are you sure?', :method => :delete, :remote => true, :class => "btn danger" if @role.persisted?
-%hr
-.row
-  .span3
-    %h4 Zugewiesene Aufgaben
-    %ul
-      - @role.all_tasks.each do |task|
-        %li
-          = task.name
+- if @role.persisted?
+  %hr
+  .row
+    .span4
+      %h4 Zugewiesene Aufgaben
+      %ul
+        - @role.all_tasks.each do |task|
+          %li
+            = task.name
 
-  .span3
-    %h4 Mitglieder der Rolle
-    %ul
-      - @role.users.each do |user|
-        %li
-          = user.name
+    .span3
+      %h4 Mitglieder der Rolle
+      %ul
+        - @role.users.each do |user|
+          %li
+            = user.name

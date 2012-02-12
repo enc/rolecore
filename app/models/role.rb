@@ -12,6 +12,11 @@ class Role < ActiveRecord::Base
   has_many :memberships
   has_many :users, :through => :memberships
 
+  after_save :check_roles
+  def check_roles
+    Checker.check_all
+  end
+
 
 
   def as_json options
@@ -43,11 +48,19 @@ class Role < ActiveRecord::Base
   end
 
   def hight
-    1 + childs.all.collect { |i| i.hight } .max
+    if childs.count > 0
+      1 + childs.all.collect { |i| i.hight } .max
+    else
+      1
+    end
   end
 
   def task_count
     all_tasks.uniq.count
+  end
+
+  def all_uppers
+    (uppers.all + uppers.all.collect { |i| i.all_uppers } ).flatten
   end
 
   def all_childs

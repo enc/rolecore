@@ -11,50 +11,52 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120113154546) do
+ActiveRecord::Schema.define(:version => 20120211224339) do
 
   create_table "badges", :force => true do |t|
     t.integer  "score"
     t.integer  "message_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
     t.integer  "role_id"
+    t.string   "comment"
   end
 
   create_table "memberships", :force => true do |t|
     t.integer  "user_id"
     t.integer  "role_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "messages", :force => true do |t|
     t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "relation_properties", :force => true do |t|
     t.integer  "relation_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "relations", :force => true do |t|
     t.integer  "parent_id"
     t.integer  "child_role_id"
     t.integer  "child_task_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.text     "context"
   end
 
   create_table "roles", :force => true do |t|
     t.string   "name"
     t.integer  "weight"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "xOffset"
-    t.integer  "yOffset"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
+    t.integer  "xOffset",    :default => 80
+    t.integer  "yOffset",    :default => 60
   end
 
   create_table "tasks", :force => true do |t|
@@ -62,8 +64,8 @@ ActiveRecord::Schema.define(:version => 20120113154546) do
     t.string   "name"
     t.boolean  "sod"
     t.integer  "weight"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
     t.integer  "xOffset"
     t.integer  "yOffset"
   end
@@ -72,15 +74,15 @@ ActiveRecord::Schema.define(:version => 20120113154546) do
     t.string   "text"
     t.string   "lang"
     t.integer  "message_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "users", :force => true do |t|
     t.string   "foreign_id"
     t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
 end
