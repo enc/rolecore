@@ -84,7 +84,7 @@ createTask = (task) ->
   clearFrame = "M129.5,60.862c0,6.979-5.469,12.638-12.216,12.638h-234.567,c-6.747,0-12.216-5.658-12.216-12.638V-60.862c0-6.979,5.469-12.638,12.216-12.638h234.567c6.747,0,12.216,5.658,12.216,12.638,V60.862z"
   plus =" M4.403-1H1v-3.173C1-4.63,0.463-5,0.006-5h-0.013C-0.463-5-1-4.63-1-4.173V-1h-3.403C-4.732-1-5-0.472-5-0.027,v0.054C-5,0.472-4.732,1-4.403,1H-1v3.173C-1,4.63-0.463,5-0.006,5h0.013C0.463,5,1,4.63,1,4.173V1h3.403C4.732,1,5,0.472,5,0.027,v-0.054C5-0.472,4.732-1,4.403-1z"
   cons = {}
-  task.scale = 0.5
+  task.scale = 0.4
 
   return {
     add_conn: (con) ->
@@ -133,7 +133,7 @@ createTask = (task) ->
       @label.adjust task.xOffset, task.yOffset
       @label.factor = task.scale
       @label.attr
-        'font-size': 48*task.scale
+        'font-size': 26*task.scale
       @label.changeColour "rgb(0,0,0)"
 
     mreset: ->
@@ -152,8 +152,8 @@ createTask = (task) ->
         type: "PUT"
 
     move: (dx, dy) ->
-      @base.move (dx - @x), (dy - @y)
-      @label.move (dx - @x), (dy - @y)
+      @base.move (dx - @x), (dy - @y), 2*task.scale
+      @label.move (dx - @x), (dy - @y), 2*task.scale
       # @plus.move (dx - @x), (dy - @y),1
       @x = dx
       @y = dy
@@ -425,7 +425,7 @@ class PlaneManager
     $('#upcont').css('left',((window.innerWidth-16)/2)-16)
     $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-22))
     $('#left').css('top',((window.innerHeight-52)/2))
-    $('#right').css('top',((window.innerHeight-52)/2)).css('left',(window.innerWidth)-32)
+    $('#right').css('top',((window.innerHeight-52)/2)).css('left',(window.innerWidth)-46)
     @resize() if @scale != 1.0
     $(window).resize =>
       # @paper.setViewBox(@ml,@mt, @x * @scale, @y * @scale)
@@ -436,7 +436,7 @@ class PlaneManager
       $('#upcont').css('left',((window.innerWidth-16)/2)-16)
       $('#down').css('left',((window.innerWidth-16)/2)-16).css('top',(window.innerHeight-19-32))
       $('#left').css('top',((window.innerHeight-92)/2))
-      $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-32)
+      $('#right').css('top',((window.innerHeight-92)/2)).css('left',(window.innerWidth)-46)
     jQuery.getJSON 'roles', (data) =>
       @drawroles(data)
       jQuery.getJSON 'tasks', (data) =>

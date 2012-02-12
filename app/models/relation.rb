@@ -13,13 +13,21 @@ class Relation < ActiveRecord::Base
     return @objects if @objects
     @objects = Array.new
     if child_role
-      @objects.push child_role.childs
-      @objects.push child_role.uppers
+      @objects.push child_role.all_childs
+      @objects.push child_role.all_uppers
     end
     if parent
-      @objects.push parent.childs
-      @objects.push parent.uppers
+      @objects.push parent.all_childs
+      @objects.push parent.all_uppers
     end
     @objects = @objects.flatten.uniq.delete_if {|item| [parent,child_role, child_task].include? item }
+  end
+  def t_linked
+    return @tobjects if @tobjects
+    @tobjects = Array.new
+    if parent
+      @tobjects.push parent.all_tasks
+    end
+    @tobjects = @tobjects.flatten.uniq.delete_if {|item| [parent,child_role, child_task].include? item }
   end
 end
